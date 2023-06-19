@@ -1,16 +1,16 @@
-package edu.hubu.user.service.impl;
+package edu.hubu.member.service.impl;
 
-import org.springframework.stereotype.Service;
-import java.util.Map;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import edu.hubu.common.utils.PageUtils;
 import edu.hubu.common.utils.Query;
+import edu.hubu.member.dao.UserDao;
+import edu.hubu.member.entity.UserEntity;
+import edu.hubu.member.service.UserService;
+import org.springframework.stereotype.Service;
 
-import edu.hubu.user.dao.UserDao;
-import edu.hubu.user.entity.UserEntity;
-import edu.hubu.user.service.UserService;
+import java.util.Map;
 
 
 @Service("userService")
@@ -24,6 +24,17 @@ public class UserServiceImpl extends ServiceImpl<UserDao, UserEntity> implements
         );
 
         return new PageUtils(page);
+    }
+
+    @Override
+    public void register(UserEntity user) {
+
+
+    }
+
+    @Override
+    public String login(String username, String password) {
+        return null;
     }
 
 }

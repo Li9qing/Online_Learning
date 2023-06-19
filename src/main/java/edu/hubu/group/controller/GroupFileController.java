@@ -1,26 +1,17 @@
 package edu.hubu.group.controller;
 
+import edu.hubu.common.utils.PageUtils;
+import edu.hubu.common.utils.R;
+import edu.hubu.group.entity.GroupFileEntity;
+import edu.hubu.group.service.GroupFileService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+
 import java.util.Arrays;
 import java.util.Map;
 
-// import org.apache.shiro.authz.annotation.RequiresPermissions;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-
-import edu.hubu.group.entity.GroupFileEntity;
-import edu.hubu.group.service.GroupFileService;
-import edu.hubu.common.utils.PageUtils;
-import edu.hubu.common.utils.R;
-
-
 
 /**
- * 
- *
  * @author yruns
  * @email yruns.sh@qq.com
  * @date 2023-06-19 20:32:03
@@ -35,8 +26,7 @@ public class GroupFileController {
      * 列表
      */
     @RequestMapping("/list")
-    // @RequiresPermissions("group:groupfile:list")
-    public R list(@RequestParam Map<String, Object> params){
+    public R list(@RequestParam Map<String, Object> params) {
         PageUtils page = groupFileService.queryPage(params);
 
         return R.ok().put("page", page);
@@ -47,9 +37,8 @@ public class GroupFileController {
      * 信息
      */
     @RequestMapping("/info/{fileId}")
-    // @RequiresPermissions("group:groupfile:info")
-    public R info(@PathVariable("fileId") Long fileId){
-		GroupFileEntity groupFile = groupFileService.getById(fileId);
+    public R info(@PathVariable("fileId") Long fileId) {
+        GroupFileEntity groupFile = groupFileService.getById(fileId);
 
         return R.ok().put("groupFile", groupFile);
     }
@@ -58,9 +47,8 @@ public class GroupFileController {
      * 保存
      */
     @RequestMapping("/save")
-    // @RequiresPermissions("group:groupfile:save")
-    public R save(@RequestBody GroupFileEntity groupFile){
-		groupFileService.save(groupFile);
+    public R save(@RequestBody GroupFileEntity groupFile) {
+        groupFileService.save(groupFile);
 
         return R.ok();
     }
@@ -69,9 +57,8 @@ public class GroupFileController {
      * 修改
      */
     @RequestMapping("/update")
-    // @RequiresPermissions("group:groupfile:update")
-    public R update(@RequestBody GroupFileEntity groupFile){
-		groupFileService.updateById(groupFile);
+    public R update(@RequestBody GroupFileEntity groupFile) {
+        groupFileService.updateById(groupFile);
 
         return R.ok();
     }
@@ -80,9 +67,8 @@ public class GroupFileController {
      * 删除
      */
     @RequestMapping("/delete")
-    // @RequiresPermissions("group:groupfile:delete")
-    public R delete(@RequestBody Long[] fileIds){
-		groupFileService.removeByIds(Arrays.asList(fileIds));
+    public R delete(@RequestBody Long[] fileIds) {
+        groupFileService.removeByIds(Arrays.asList(fileIds));
 
         return R.ok();
     }

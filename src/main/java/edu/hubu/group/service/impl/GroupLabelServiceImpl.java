@@ -1,16 +1,16 @@
 package edu.hubu.group.service.impl;
 
-import org.springframework.stereotype.Service;
-import java.util.Map;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import edu.hubu.common.utils.PageUtils;
 import edu.hubu.common.utils.Query;
-
 import edu.hubu.group.dao.GroupLabelDao;
 import edu.hubu.group.entity.GroupLabelEntity;
 import edu.hubu.group.service.GroupLabelService;
+import org.springframework.stereotype.Service;
+
+import java.util.Map;
 
 
 @Service("groupLabelService")

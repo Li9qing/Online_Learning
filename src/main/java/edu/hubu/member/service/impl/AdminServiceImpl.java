@@ -1,16 +1,16 @@
-package edu.hubu.user.service.impl;
+package edu.hubu.member.service.impl;
 
-import org.springframework.stereotype.Service;
-import java.util.Map;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import edu.hubu.common.utils.PageUtils;
 import edu.hubu.common.utils.Query;
+import edu.hubu.member.dao.AdminDao;
+import edu.hubu.member.entity.AdminEntity;
+import edu.hubu.member.service.AdminService;
+import org.springframework.stereotype.Service;
 
-import edu.hubu.user.dao.AdminDao;
-import edu.hubu.user.entity.AdminEntity;
-import edu.hubu.user.service.AdminService;
+import java.util.Map;
 
 
 @Service("adminService")
