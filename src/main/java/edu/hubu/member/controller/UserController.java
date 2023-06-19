@@ -2,11 +2,14 @@ package edu.hubu.member.controller;
 
 import edu.hubu.common.utils.PageUtils;
 import edu.hubu.common.utils.R;
+import edu.hubu.common.utils.UserHolder;
 import edu.hubu.member.entity.UserEntity;
 import edu.hubu.member.service.UserService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.websocket.server.PathParam;
 import java.util.Arrays;
 import java.util.Map;
@@ -18,7 +21,7 @@ import java.util.Map;
  * @date 2023-06-19 19:59:54
  */
 @RestController
-
+@Slf4j
 @RequestMapping("member/user")
 public class UserController {
     @Autowired
@@ -40,17 +43,19 @@ public class UserController {
      */
     @GetMapping("/login")
     public R login(@RequestParam("username") String username, @PathParam("password") String password) {
-        String authorization = userService.login(username, password);
+        R result = userService.login(username, password);
 
-        return R.ok().put("authorization", authorization);
+        return result;
     }
 
     /**
      * 列表
      */
     @RequestMapping("/list")
-    public R list(@RequestParam Map<String, Object> params) {
+    public R list(@RequestParam Map<String, Object> params, HttpServletRequest request) {
         PageUtils page = userService.queryPage(params);
+        Long userId = UserHolder.getUserId();
+        log.info("userId:{}", userId);
 
         return R.ok().put("page", page);
     }

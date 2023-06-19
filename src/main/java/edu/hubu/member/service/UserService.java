@@ -2,6 +2,7 @@ package edu.hubu.member.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import edu.hubu.common.utils.PageUtils;
+import edu.hubu.common.utils.R;
 import edu.hubu.member.entity.UserEntity;
 
 import java.util.Map;
@@ -17,6 +18,6 @@ public interface UserService extends IService<UserEntity> {
 
     void register(UserEntity user);
 
-    String login(String username, String password);
+    R login(String username, String password);
 }
 

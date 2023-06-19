@@ -19,3 +19,11 @@ mybatis-plus:
       id-type: auto
       logic-delete-value: 1
       logic-not-delete-value: 0
+
+# jwt ??
+jwt:
+  header: "Authorization"     # token ????
+  tokenPrefix: "Bearer "      # token ??
+  secret: "hubu@university" # ??
+  expireTime: 2592000      # ???? 30 ?
+
