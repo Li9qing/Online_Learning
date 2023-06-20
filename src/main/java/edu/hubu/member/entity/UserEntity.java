@@ -1,5 +1,6 @@
 package edu.hubu.member.entity;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
@@ -30,6 +31,11 @@ public class UserEntity implements Serializable {
      * 密码
      */
     private String password;
+    /**
+     * 重复密码
+     */
+    @TableField(exist = false)
+    private String rePassword;
     /**
      * 封禁状态 1封禁 0正常
      */

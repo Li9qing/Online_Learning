@@ -16,7 +16,7 @@ public interface UserService extends IService<UserEntity> {
 
     PageUtils queryPage(Map<String, Object> params);
 
-    void register(UserEntity user);
+    R register(UserEntity user);
 
     R login(String username, String password);
 }

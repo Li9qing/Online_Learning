@@ -33,9 +33,8 @@ public class UserController {
      */
     @PostMapping("/register")
     public R register(@RequestBody UserEntity user) {
-        userService.register(user);
 
-        return R.ok();
+        return userService.register(user);
     }
 
     /**
@@ -43,9 +42,8 @@ public class UserController {
      */
     @GetMapping("/login")
     public R login(@RequestParam("username") String username, @PathParam("password") String password) {
-        R result = userService.login(username, password);
 
-        return result;
+        return userService.login(username, password);
     }
 
     /**

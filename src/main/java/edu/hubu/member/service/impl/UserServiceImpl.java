@@ -29,9 +29,21 @@ public class UserServiceImpl extends ServiceImpl<UserDao, UserEntity> implements
     }
 
     @Override
-    public void register(UserEntity user) {
+    public R register(UserEntity user) {
+        // 验证密码和重复密码是否一致
+        if (!user.getPassword().equals(user.getRePassword())) {
+            return R.error("密码和重复密码不一致");
+        }
 
+        // 验证用户名是否存在
+        UserEntity userEntity = this.query().eq("username", user.getUsername()).one();
+        if (userEntity != null) {
+            return R.error("用户名已存在");
+        }
 
+        // 保存用户
+        this.save(user);
+        return R.ok();
     }
 
     @Override
