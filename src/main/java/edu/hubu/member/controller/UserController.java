@@ -3,6 +3,7 @@ package edu.hubu.member.controller;
 import edu.hubu.common.utils.PageUtils;
 import edu.hubu.common.utils.R;
 import edu.hubu.common.utils.UserHolder;
+import edu.hubu.member.dto.UserDto;
 import edu.hubu.member.entity.UserEntity;
 import edu.hubu.member.service.UserService;
 import lombok.extern.slf4j.Slf4j;
@@ -50,10 +51,10 @@ public class UserController {
      * 列表
      */
     @RequestMapping("/list")
-    public R list(@RequestParam Map<String, Object> params, HttpServletRequest request) {
+    public R list(@RequestParam Map<String, Object> params) {
         PageUtils page = userService.queryPage(params);
-        Long userId = UserHolder.getUserId();
-        log.info("userId:{}", userId);
+        UserDto user = UserHolder.getUser();
+        log.info("user:{}", user.toString());
 
         return R.ok().put("page", page);
     }

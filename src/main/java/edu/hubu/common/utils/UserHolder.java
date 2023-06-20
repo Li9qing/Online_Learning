@@ -1,14 +1,16 @@
 package edu.hubu.common.utils;
 
 
-public class UserHolder {
-    private static final ThreadLocal<Long> tl = new ThreadLocal<>();
+import edu.hubu.member.dto.UserDto;
 
-    public static void saveUserId(Long userId){
-        tl.set(userId);
+public class UserHolder {
+    private static final ThreadLocal<UserDto> tl = new ThreadLocal<>();
+
+    public static void saveUser(UserDto user){
+        tl.set(user);
     }
 
-    public static Long getUserId(){
+    public static UserDto getUser(){
         return tl.get();
     }
 

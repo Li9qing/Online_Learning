@@ -11,7 +11,9 @@ package edu.hubu.common.utils;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 
 import java.io.Serializable;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 分页工具类
@@ -66,6 +68,8 @@ public class PageUtils implements Serializable {
         this.currPage = (int) page.getCurrent();
         this.totalPage = (int) page.getPages();
     }
+
+
 
     public int getTotalCount() {
         return totalCount;

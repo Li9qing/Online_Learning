@@ -1,6 +1,7 @@
 package edu.hubu.exam.entity;
 
 import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
@@ -51,8 +52,17 @@ public class ExamEntity implements Serializable {
      */
     private Date updateTime;
     /**
+     * 过期时间
+     */
+    private Date expireAt;
+    /**
+     * 发布状态
+     */
+    private Integer showStatus;
+    /**
      * 是否删除
      */
+    @TableLogic(value = "0", delval = "1")
     private Integer isDelete;
 
 }

@@ -22,11 +22,15 @@ public class Constant {
     /**
      * 当前页码
      */
-    public static final String PAGE = "page";
+    public static final String PAGE = "pageNum";
     /**
      * 每页显示记录数
      */
-    public static final String LIMIT = "limit";
+    public static final String LIMIT = "pageSize";
+    /**
+     * 每页默认显示记录数
+     */
+    public static final Integer DEFAULT_SIZE = 10;
     /**
      * 排序字段
      */
@@ -39,6 +43,8 @@ public class Constant {
      * 升序
      */
     public static final String ASC = "asc";
+
+
 
     /**
      * 菜单类型

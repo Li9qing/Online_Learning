@@ -43,7 +43,7 @@ public class UserEntity implements Serializable {
     /**
      * 是否有教师权限 1有 0无
      */
-    private String teacherAccess;
+    private Integer teacherAccess;
     /**
      * 昵称
      */

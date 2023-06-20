@@ -37,7 +37,7 @@ public class SubmitEntity implements Serializable {
     /**
      * 用户选项
      */
-    private String anwser;
+    private String answer;
     /**
      * 提交时间
      */

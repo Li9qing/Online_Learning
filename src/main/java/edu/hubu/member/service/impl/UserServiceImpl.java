@@ -12,6 +12,8 @@ import edu.hubu.member.entity.UserEntity;
 import edu.hubu.member.service.UserService;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.Map;
 
 
@@ -40,6 +42,13 @@ public class UserServiceImpl extends ServiceImpl<UserDao, UserEntity> implements
         if (userEntity != null) {
             return R.error("用户名已存在");
         }
+        if (user.getStatus() == null) {
+            user.setStatus(0);
+        }
+        if (user.getTeacherAccess() == null) {
+            user.setTeacherAccess(0);
+        }
+        user.setCreateTime(new Date());
 
         // 保存用户
         this.save(user);
@@ -58,7 +67,8 @@ public class UserServiceImpl extends ServiceImpl<UserDao, UserEntity> implements
         }
 
         // 登录成功，加上token
-        String token = JwtUtils.createToken(user.getUsername(), user.getId());
+        String token = JwtUtils.createToken(user.getUsername(), user.getId(),
+                user.getTeacherAccess(), user.getNickName());
 
         return R.ok().put("token", token);
     }

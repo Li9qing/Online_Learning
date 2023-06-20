@@ -15,6 +15,11 @@ package edu.hubu.common.utils;
  */
 public class RedisKeys {
 
+    /**
+     * 测试二维码
+     */
+    public static final String EXAM_QRCODE = "exam:qr:";
+
     public static String getSysConfigKey(String key) {
         return "sys:config:" + key;
     }

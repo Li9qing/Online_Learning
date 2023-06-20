@@ -35,6 +35,10 @@ public class AdminEntity implements Serializable {
      */
     private String avatar;
     /**
+     * 昵称
+     */
+    private String nickName;
+    /**
      * 创建时间
      */
     private Date createTime;

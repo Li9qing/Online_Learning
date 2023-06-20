@@ -19,7 +19,6 @@ public class QuestionPaperEntity implements Serializable {
     /**
      * 题目id
      */
-    @TableId
     private Long questionId;
     /**
      * 分数

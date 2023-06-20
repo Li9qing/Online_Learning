@@ -14,5 +14,7 @@ import java.util.Map;
 public interface ExamService extends IService<ExamEntity> {
 
     PageUtils queryPage(Map<String, Object> params);
+
+    ExamEntity release(ExamEntity exam);
 }
 

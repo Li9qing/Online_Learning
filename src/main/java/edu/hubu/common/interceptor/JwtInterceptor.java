@@ -7,6 +7,7 @@ import com.auth0.jwt.interfaces.DecodedJWT;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.hubu.common.utils.JwtUtils;
 import edu.hubu.common.utils.UserHolder;
+import edu.hubu.member.dto.UserDto;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.servlet.HandlerInterceptor;
 
@@ -37,8 +38,11 @@ public class JwtInterceptor implements HandlerInterceptor {
             map.put("state", true);
             map.put("msg", "验证token成功!");
 
-            // 将用户id写入request
-            UserHolder.saveUserId(verify.getClaim("userId").asLong());
+            // 将用户id写入LocalThread
+            UserDto userDto = new UserDto(verify.getClaim("userId").asLong(),
+                    verify.getClaim("authority").asInt(),
+                    verify.getClaim("nickName").asString());
+            UserHolder.saveUser(userDto);
             return true;
 
         } catch (SignatureVerificationException e) {// 签名匹配异常

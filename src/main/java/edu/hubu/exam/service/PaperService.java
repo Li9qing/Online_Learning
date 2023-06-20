@@ -3,6 +3,7 @@ package edu.hubu.exam.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import edu.hubu.common.utils.PageUtils;
 import edu.hubu.exam.entity.PaperEntity;
+import edu.hubu.exam.entity.QuestionPaperEntity;
 
 import java.util.Map;
 
@@ -14,5 +15,9 @@ import java.util.Map;
 public interface PaperService extends IService<PaperEntity> {
 
     PageUtils queryPage(Map<String, Object> params);
+
+    void addQuestion(QuestionPaperEntity questionPaper);
+
+    void removeQuestion(QuestionPaperEntity questionPaper);
 }
 

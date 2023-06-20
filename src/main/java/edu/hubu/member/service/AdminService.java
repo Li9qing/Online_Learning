@@ -2,6 +2,7 @@ package edu.hubu.member.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import edu.hubu.common.utils.PageUtils;
+import edu.hubu.common.utils.R;
 import edu.hubu.member.entity.AdminEntity;
 
 import java.util.Map;
@@ -14,5 +15,7 @@ import java.util.Map;
 public interface AdminService extends IService<AdminEntity> {
 
     PageUtils queryPage(Map<String, Object> params);
+
+    R login(String username, String password);
 }
 

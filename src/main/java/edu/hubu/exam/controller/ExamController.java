@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Arrays;
+import java.util.Date;
 import java.util.Map;
 
 
@@ -17,7 +18,7 @@ import java.util.Map;
  * @date 2023-06-19 19:59:54
  */
 @RestController
-@RequestMapping("exam/exam")
+@RequestMapping("exam/test")
 public class ExamController {
     @Autowired
     private ExamService examService;
@@ -34,20 +35,23 @@ public class ExamController {
 
 
     /**
-     * 信息
+     * 发布测评
      */
-    @RequestMapping("/info/{id}")
-    public R info(@PathVariable("id") Long id) {
-        ExamEntity exam = examService.getById(id);
+    @PostMapping("/release")
+    public R release(@RequestBody ExamEntity e) {
+        ExamEntity exam = examService.release(e);
 
         return R.ok().put("exam", exam);
     }
 
     /**
-     * 保存
+     * 创建测评
      */
-    @RequestMapping("/save")
+    @PostMapping("/save")
     public R save(@RequestBody ExamEntity exam) {
+        exam.setIsDelete(0);
+        exam.setCreateTime(new Date());
+        exam.setUpdateTime(new Date());
         examService.save(exam);
 
         return R.ok();

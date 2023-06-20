@@ -1,13 +1,18 @@
 package edu.hubu.exam.controller;
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import edu.hubu.common.utils.PageUtils;
 import edu.hubu.common.utils.R;
+import edu.hubu.common.utils.UserHolder;
 import edu.hubu.exam.entity.QuestionEntity;
 import edu.hubu.exam.service.QuestionService;
+import edu.hubu.member.dto.UserDto;
+import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 
@@ -23,12 +28,20 @@ public class QuestionController {
     private QuestionService questionService;
 
     /**
-     * 列表
+     * 上传题目
+     */
+    @PostMapping("/save")
+    public R save(@RequestBody QuestionEntity question) {
+
+        return questionService.saveQuestion(question);
+    }
+
+    /**
+     * 列表，根据类型、类别查看，根据题目内容模糊搜索题目。
      */
     @RequestMapping("/list")
     public R list(@RequestParam Map<String, Object> params) {
         PageUtils page = questionService.queryPage(params);
-
         return R.ok().put("page", page);
     }
 
@@ -43,20 +56,12 @@ public class QuestionController {
         return R.ok().put("question", question);
     }
 
-    /**
-     * 保存
-     */
-    @RequestMapping("/save")
-    public R save(@RequestBody QuestionEntity question) {
-        questionService.save(question);
 
-        return R.ok();
-    }
 
     /**
      * 修改
      */
-    @RequestMapping("/update")
+    @PutMapping("/update")
     public R update(@RequestBody QuestionEntity question) {
         questionService.updateById(question);
 
@@ -66,10 +71,10 @@ public class QuestionController {
     /**
      * 删除
      */
-    @RequestMapping("/delete")
+    @DeleteMapping("/delete")
     public R delete(@RequestBody Long[] ids) {
-        questionService.removeByIds(Arrays.asList(ids));
 
+        questionService.removeByIds(Arrays.asList(ids));
         return R.ok();
     }
 

@@ -84,10 +84,12 @@ public class JwtUtils {
      * @param sub jwt 所面向的用户，即用户名
      * @return token 值
      */
-    public static String createToken(String sub, Long userId) {
+    public static String createToken(String sub, Long userId, Integer authority, String nickName) {
         return tokenPrefix + JWT.create()
                 .withSubject(sub)
                 .withClaim("userId", userId)
+                .withClaim("authority", authority)
+                .withClaim("nickName", nickName)
                 .withExpiresAt(new Date(System.currentTimeMillis() + expireTime * 1000))
                 .sign(Algorithm.HMAC256(secret));
     }
