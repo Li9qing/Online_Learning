@@ -1,9 +1,11 @@
 package edu.hubu.exam.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.google.zxing.WriterException;
 import edu.hubu.common.utils.PageUtils;
 import edu.hubu.exam.entity.ExamEntity;
 
+import java.io.IOException;
 import java.util.Map;
 
 /**
@@ -15,6 +17,6 @@ public interface ExamService extends IService<ExamEntity> {
 
     PageUtils queryPage(Map<String, Object> params);
 
-    ExamEntity release(ExamEntity exam);
+    ExamEntity release(ExamEntity exam) throws IOException, WriterException;
 }
 

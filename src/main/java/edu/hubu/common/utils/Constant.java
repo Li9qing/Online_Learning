@@ -44,6 +44,11 @@ public class Constant {
      */
     public static final String ASC = "asc";
 
+    /**
+     * 二维码路径
+     */
+    public static final String QR_PATH = "D://";
+
 
 
     /**

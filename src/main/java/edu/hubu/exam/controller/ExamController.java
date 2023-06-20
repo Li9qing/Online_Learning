@@ -1,5 +1,6 @@
 package edu.hubu.exam.controller;
 
+import com.google.zxing.WriterException;
 import edu.hubu.common.utils.PageUtils;
 import edu.hubu.common.utils.R;
 import edu.hubu.exam.entity.ExamEntity;
@@ -7,6 +8,7 @@ import edu.hubu.exam.service.ExamService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.Map;
@@ -38,7 +40,7 @@ public class ExamController {
      * 发布测评
      */
     @PostMapping("/release")
-    public R release(@RequestBody ExamEntity e) {
+    public R release(@RequestBody ExamEntity e) throws IOException, WriterException {
         ExamEntity exam = examService.release(e);
 
         return R.ok().put("exam", exam);
