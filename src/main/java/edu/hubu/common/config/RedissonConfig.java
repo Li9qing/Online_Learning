@@ -1,5 +1,6 @@
 package edu.hubu.common.config;
 
+import lombok.extern.slf4j.Slf4j;
 import org.redisson.Redisson;
 import org.redisson.api.RedissonClient;
 import org.redisson.config.Config;
@@ -11,6 +12,7 @@ import org.springframework.context.annotation.Configuration;
  * RedisConfig
  */
 @Configuration
+@Slf4j
 public class RedissonConfig {
 
     @Value("${spring.redis.host}")
