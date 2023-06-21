@@ -2,6 +2,7 @@ package edu.hubu.group.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import edu.hubu.common.utils.PageUtils;
+import edu.hubu.common.utils.R;
 import edu.hubu.group.entity.GroupEntity;
 
 import java.util.Map;
@@ -14,5 +15,7 @@ import java.util.Map;
 public interface GroupService extends IService<GroupEntity> {
 
     PageUtils queryPage(Map<String, Object> params);
+
+    R uploadAvatar(Long groupId, String filePath);
 }
 

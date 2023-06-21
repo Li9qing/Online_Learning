@@ -12,7 +12,7 @@ import java.io.Serializable;
  * @date 2023-06-19 20:32:03
  */
 @Data
-@TableName("group")
+@TableName("`group`")
 public class GroupEntity implements Serializable {
     private static final long serialVersionUID = 1L;
 
@@ -37,5 +37,9 @@ public class GroupEntity implements Serializable {
      * 组长id
      */
     private Long userId;
+    /**
+     * 小组标签
+     */
+    private String tag;
 
 }

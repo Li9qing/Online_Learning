@@ -1,6 +1,7 @@
 package edu.hubu.common.utils;
 
 import io.minio.MinioClient;
+import io.minio.RemoveObjectArgs;
 import io.minio.UploadObjectArgs;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
@@ -68,6 +69,28 @@ public class MinioUtils {
             log.error("上传文件出错, bucket:{}, objectName: {}, 错误信息: {}", bucket, objectName, e.getMessage());
         }
 
+    }
+
+    // 在minio中删除文件
+    public void deleteFileFromMinIO(String objectName) {
+        // 根据文件后缀名选择bucket
+        String bucket;
+        if (objectName.endsWith(".mp4")) {
+            bucket = videoFilesBucket;
+        } else {
+            bucket = mediaFilesBucket;
+        }
+        try {
+            // 删除文件的信息
+            RemoveObjectArgs removeObjectArgs = RemoveObjectArgs.builder()
+                    .bucket(bucket)
+                    .object(objectName)
+                    .build();
+
+            minioClient.removeObject(removeObjectArgs);
+        } catch (Exception e) {
+            log.error("删除文件出错, bucket:{}, objectName: {}, 错误信息: {}", bucket, objectName, e.getMessage());
+        }
     }
 
     // 根据当前时间获取 年/月/日
