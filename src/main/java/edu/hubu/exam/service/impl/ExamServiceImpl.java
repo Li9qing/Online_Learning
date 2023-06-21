@@ -45,7 +45,7 @@ public class ExamServiceImpl extends ServiceImpl<ExamDao, ExamEntity> implements
     @Override
     public ExamEntity release(ExamEntity e) throws IOException, WriterException {
         ExamEntity exam = this.getById(e.getId());
-        if (exam.getShowStatus() == 1) {
+        if (exam.getShowStatus() != null && exam.getShowStatus() == 1) {
             CustomException.cast("该测评已发布，不能重复发布");
         }
         // 设置发布状态
@@ -55,20 +55,20 @@ public class ExamServiceImpl extends ServiceImpl<ExamDao, ExamEntity> implements
         this.updateById(exam);
 
         // 生成二维码
-        String uri = "/exam/" + e.getId().toString();
-        String filePath = Constant.QR_PATH + e.getId() + ".png";
+        String uri = "/exam/" + exam.getId().toString();
+        String filePath = Constant.QR_PATH + exam.getId() + ".png";
         QRCodeGenerator.generateQRCodeImage(uri, 350, 350, filePath);
         // 上传二维码到minio
-        String objectName = "exam/" + e.getId().toString() + ".png";
+        String objectName = "exam/" + exam.getId().toString() + ".png";
         minioUtils.uploadFileToMinIO(filePath, objectName);
         // 删除本地二维码
         Files.deleteIfExists(Paths.get(filePath));
 
         // 将二维码路径写入redis
-        redisTemplate.opsForSet().add(RedisKeys.EXAM_QRCODE + e.getId().toString(),
+        redisTemplate.opsForSet().add(RedisKeys.EXAM_QRCODE + exam.getId().toString(),
                 objectName);
-        redisTemplate.expire(RedisKeys.EXAM_QRCODE + e.getId().toString(),
-                e.getExpireAt().getTime() - System.currentTimeMillis(), TimeUnit.MILLISECONDS);
+        redisTemplate.expire(RedisKeys.EXAM_QRCODE + exam.getId().toString(),
+                exam.getExpireAt().getTime() - System.currentTimeMillis(), TimeUnit.MILLISECONDS);
 
         return exam;
     }

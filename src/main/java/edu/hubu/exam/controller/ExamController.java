@@ -40,8 +40,14 @@ public class ExamController {
      * 发布测评
      */
     @PostMapping("/release")
-    public R release(@RequestBody ExamEntity e) throws IOException, WriterException {
-        ExamEntity exam = examService.release(e);
+    public R release(@RequestBody ExamEntity e) {
+
+        ExamEntity exam = null;
+        try {
+            exam = examService.release(e);
+        } catch (IOException | WriterException ex) {
+            throw new RuntimeException(ex);
+        }
 
         return R.ok().put("exam", exam);
     }

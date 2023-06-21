@@ -1,5 +1,5 @@
 server:
-  port: 9090
+  port: 9010
 
 spring:
   datasource:
@@ -16,6 +16,8 @@ spring:
         max-idle: 10
         min-idle: 1
         time-between-eviction-runs: 10s
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
   application:
     name: online_learning
 

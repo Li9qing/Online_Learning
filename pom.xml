@@ -18,6 +18,7 @@
     </properties>
 
     <dependencies>
+
         <!--        生成二维码用-->
         <dependency>
             <groupId>com.google.zxing</groupId>
