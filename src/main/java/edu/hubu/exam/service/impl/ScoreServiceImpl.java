@@ -5,7 +5,9 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import edu.hubu.common.utils.PageUtils;
 import edu.hubu.common.utils.Query;
+import edu.hubu.common.utils.R;
 import edu.hubu.exam.dao.ScoreDao;
+import edu.hubu.exam.dto.ManualReview;
 import edu.hubu.exam.entity.QuestionEntity;
 import edu.hubu.exam.entity.QuestionPaperEntity;
 import edu.hubu.exam.entity.ScoreEntity;
@@ -46,7 +48,7 @@ public class ScoreServiceImpl extends ServiceImpl<ScoreDao, ScoreEntity> impleme
 
     @Override
     @Transactional
-    public void review(Long examId) {
+    public void autoReview(Long examId) {
         // 根据examId找到paper_id
         Long paperId = examService.getById(examId).getPaperId();
 
@@ -93,6 +95,25 @@ public class ScoreServiceImpl extends ServiceImpl<ScoreDao, ScoreEntity> impleme
 
         // 将items写回submit表
         submitService.updateBatchById(items);
+    }
+
+    @Override
+    public R manualReview(ManualReview manualReview) {
+        try {
+            SubmitEntity submit = submitService.query()
+                    .eq("exam_id", manualReview.getExamId())
+                    .eq("question_id", manualReview.getQuestionId())
+                    .eq("user_id", manualReview.getUserId())
+                    .one();
+            submit.setScore(manualReview.getScore());
+            submit.setComment(manualReview.getComment());
+
+            submitService.updateById(submit);
+            return R.ok();
+        } catch (Exception e) {
+            return R.error("评分出错");
+        }
+
     }
 
 }

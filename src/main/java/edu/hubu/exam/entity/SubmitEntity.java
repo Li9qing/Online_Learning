@@ -51,5 +51,8 @@ public class SubmitEntity implements Serializable {
      * 得分
      */
     private Integer score;
-
+    /**
+     * 评语
+     */
+    private String comment;
 }

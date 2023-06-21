@@ -2,6 +2,7 @@ package edu.hubu.exam.controller;
 
 import edu.hubu.common.utils.PageUtils;
 import edu.hubu.common.utils.R;
+import edu.hubu.exam.dto.ManualReview;
 import edu.hubu.exam.entity.ScoreEntity;
 import edu.hubu.exam.service.ScoreService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,10 +28,19 @@ public class ScoreController {
      * 自动批阅客观题 type=1
      */
     @GetMapping("/review/{examId}")
-    public R reviewByExamId(@PathVariable Long examId) {
+    public R autoReview(@PathVariable Long examId) {
 
-        scoreService.review(examId);
+        scoreService.autoReview(examId);
         return R.ok();
+    }
+
+    /**
+     * 手动批阅主观题 type=2
+     */
+    @PostMapping("/review")
+    public R manualReview(@RequestBody ManualReview manualReview) {
+
+        return scoreService.manualReview(manualReview);
     }
 
 
