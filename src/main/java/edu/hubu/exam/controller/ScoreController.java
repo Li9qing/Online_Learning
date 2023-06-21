@@ -23,6 +23,17 @@ public class ScoreController {
     private ScoreService scoreService;
 
 
+    /**
+     * 自动批阅客观题 type=1
+     */
+    @GetMapping("/review/{examId}")
+    public R reviewByExamId(@PathVariable Long examId) {
+
+        scoreService.review(examId);
+        return R.ok();
+    }
+
+
 
     /**
      * 信息

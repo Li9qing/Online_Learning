@@ -13,6 +13,9 @@ import java.util.Map;
  */
 public interface SubmitService extends IService<SubmitEntity> {
 
-    PageUtils queryPage(Map<String, Object> params);
+    PageUtils queryPage(Map<String, Object> params, Long examId, Long userId);
+
+    PageUtils queryPageByQId(Map<String, Object> params, Long qId);
+
 }
 

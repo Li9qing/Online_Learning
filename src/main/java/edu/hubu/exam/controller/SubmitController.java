@@ -23,14 +23,31 @@ public class SubmitController {
     private SubmitService submitService;
 
     /**
-     * 列表
+     * 根据用户id，评测id查看提交的答案
      */
-    @RequestMapping("/list")
-    public R list(@RequestParam Map<String, Object> params) {
-        PageUtils page = submitService.queryPage(params);
+    @GetMapping("/list/{examId}/{userId}")
+    public R listByExamAndUser(@RequestParam Map<String, Object> params, @PathVariable Long examId, @PathVariable Long userId) {
+        if (examId == null || userId == null) {
+            return R.error("测评id或用户id不能为空");
+        }
+        PageUtils page = submitService.queryPage(params, examId, userId);
 
         return R.ok().put("page", page);
     }
+
+    /**
+     * 根据题目id查看提交的答案
+     */
+    @GetMapping("/list/q/{q_id}")
+    public R listByQId(@RequestParam Map<String, Object> params, @PathVariable("q_id") Long qId) {
+        if (qId == null) {
+            return R.error("测评id或用户id不能为空");
+        }
+        PageUtils page = submitService.queryPageByQId(params, qId);
+
+        return R.ok().put("page", page);
+    }
+
 
 
     /**

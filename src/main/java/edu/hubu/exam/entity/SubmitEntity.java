@@ -18,9 +18,14 @@ public class SubmitEntity implements Serializable {
     private static final long serialVersionUID = 1L;
 
     /**
-     * 测评id
+     * id
      */
     @TableId
+    private Long Id;
+
+    /**
+     * 测评id
+     */
     private Long examId;
     /**
      * 试卷id
@@ -42,5 +47,9 @@ public class SubmitEntity implements Serializable {
      * 提交时间
      */
     private Date submitTime;
+    /**
+     * 得分
+     */
+    private Integer score;
 
 }
