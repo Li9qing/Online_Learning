@@ -24,6 +24,8 @@ public class MvcConfig implements WebMvcConfigurer {
         // 统一拦截测验模块的题目crud功能
         registry.addInterceptor(new ExamInterceptor())
                 .addPathPatterns("/exam/question/**")
-                .addPathPatterns("/exam/paper/**");
+                .addPathPatterns("/exam/paper/**")
+                .excludePathPatterns("/exam/comment/**");   // 用户可以访问
+
     }
 }

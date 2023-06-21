@@ -22,15 +22,6 @@ public class ScoreController {
     @Autowired
     private ScoreService scoreService;
 
-    /**
-     * 列表
-     */
-    @RequestMapping("/list")
-    public R list(@RequestParam Map<String, Object> params) {
-        PageUtils page = scoreService.queryPage(params);
-
-        return R.ok().put("page", page);
-    }
 
 
     /**

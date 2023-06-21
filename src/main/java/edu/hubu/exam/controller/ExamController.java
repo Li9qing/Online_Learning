@@ -5,6 +5,7 @@ import edu.hubu.common.utils.PageUtils;
 import edu.hubu.common.utils.R;
 import edu.hubu.exam.entity.ExamEntity;
 import edu.hubu.exam.service.ExamService;
+import edu.hubu.exam.service.ScoreService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -22,15 +23,19 @@ import java.util.Map;
 @RestController
 @RequestMapping("exam/test")
 public class ExamController {
+
     @Autowired
     private ExamService examService;
 
+    @Autowired
+    private ScoreService scoreService;
+
     /**
-     * 列表
+     * 查看用户的测评开始时间，测评完成时间以及用户对测评的评价
      */
-    @RequestMapping("/list")
+    @GetMapping("/list")
     public R list(@RequestParam Map<String, Object> params) {
-        PageUtils page = examService.queryPage(params);
+        PageUtils page = scoreService.queryPage(params);
 
         return R.ok().put("page", page);
     }
@@ -53,6 +58,15 @@ public class ExamController {
     }
 
     /**
+     * 获取测评二维码
+     */
+    @GetMapping("/qr/{id}")
+    public R getQRCode(@PathVariable Long id) {
+
+        return examService.getQRCode(id);
+    }
+
+    /**
      * 创建测评
      */
     @PostMapping("/save")
@@ -64,6 +78,8 @@ public class ExamController {
 
         return R.ok();
     }
+
+
 
     /**
      * 修改

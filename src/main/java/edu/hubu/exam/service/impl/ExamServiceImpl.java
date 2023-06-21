@@ -63,9 +63,10 @@ public class ExamServiceImpl extends ServiceImpl<ExamDao, ExamEntity> implements
         minioUtils.uploadFileToMinIO(filePath, objectName);
         // 删除本地二维码
         Files.deleteIfExists(Paths.get(filePath));
+        // todo 延时删除minio中的二维码
 
         // 将二维码路径写入redis
-        redisTemplate.opsForSet().add(RedisKeys.EXAM_QRCODE + exam.getId().toString(),
+        redisTemplate.opsForValue().set(RedisKeys.EXAM_QRCODE + exam.getId().toString(),
                 objectName);
         redisTemplate.expire(RedisKeys.EXAM_QRCODE + exam.getId().toString(),
                 exam.getExpireAt().getTime() - System.currentTimeMillis(), TimeUnit.MILLISECONDS);
@@ -73,7 +74,26 @@ public class ExamServiceImpl extends ServiceImpl<ExamDao, ExamEntity> implements
         return exam;
     }
 
+    @Override
+    public R getQRCode(Long id) {
+        ExamEntity exam = this.getById(id);
+        if (exam == null) {
+            return R.error("该测评不存在");
+        }
 
+        if (exam.getShowStatus() == null || exam.getShowStatus() == 0) {
+            return R.error("该测评尚未发布");
+        }
+
+        // 从redis中获取二维码路径
+        String objectName = redisTemplate.opsForValue().get(RedisKeys.EXAM_QRCODE + id.toString());
+
+        if (objectName == null) {
+            return R.error("二维码已过期");
+        }
+
+        return R.ok().put("qrLink", objectName);
+    }
 
 
 }
