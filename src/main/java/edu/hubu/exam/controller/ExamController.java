@@ -3,6 +3,7 @@ package edu.hubu.exam.controller;
 import com.google.zxing.WriterException;
 import edu.hubu.common.utils.PageUtils;
 import edu.hubu.common.utils.R;
+import edu.hubu.exam.dto.ExamSearchDto;
 import edu.hubu.exam.entity.ExamEntity;
 import edu.hubu.exam.service.ExamService;
 import edu.hubu.exam.service.ScoreService;
@@ -62,7 +63,7 @@ public class ExamController {
     /**
      * 获取测评二维码
      */
-    @GetMapping("/qr/{id}")
+    @GetMapping("/public/qr/{id}")
     public R getQRCode(@PathVariable Long id) {
 
         return examService.getQRCode(id);
@@ -79,6 +80,14 @@ public class ExamController {
         examService.save(exam);
 
         return R.ok();
+    }
+
+    /**
+     * 搜索测评信息
+     */
+    @PostMapping("/public/search")
+    public R search(@RequestParam Map<String, Object> params, @RequestBody ExamSearchDto examSearchDto) {
+        return examService.search(params, examSearchDto);
     }
 
 

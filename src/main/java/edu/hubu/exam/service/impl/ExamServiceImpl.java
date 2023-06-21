@@ -7,9 +7,11 @@ import com.google.zxing.WriterException;
 import edu.hubu.common.exception.CustomException;
 import edu.hubu.common.utils.*;
 import edu.hubu.exam.dao.ExamDao;
+import edu.hubu.exam.dto.ExamSearchDto;
 import edu.hubu.exam.entity.ExamEntity;
 import edu.hubu.exam.service.ExamService;
 import io.minio.UploadObjectArgs;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -18,12 +20,10 @@ import org.springframework.stereotype.Service;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-
+@Slf4j
 @Service("examService")
 public class ExamServiceImpl extends ServiceImpl<ExamDao, ExamEntity> implements ExamService {
 
@@ -95,6 +95,22 @@ public class ExamServiceImpl extends ServiceImpl<ExamDao, ExamEntity> implements
         return R.ok().put("qrLink", objectName);
     }
 
+    @Override
+    public R search(Map<String, Object> params, ExamSearchDto examSearchDto) {
+        String sortBy = examSearchDto.getSortBy() != null ?
+                (examSearchDto.getSortBy() == 1 ? "create_time": "expire_at"): null;
+
+        IPage<ExamEntity> page = this.page(
+                new Query<ExamEntity>().getPage(params),
+                new QueryWrapper<ExamEntity>()
+                        .eq(examSearchDto.getType() != null, "type", examSearchDto.getType())
+                        .eq("show_status", 1)
+                        .like(examSearchDto.getKey() != null, "description", examSearchDto.getKey())
+                        .orderBy(sortBy != null, false,sortBy)
+        );
+
+        return R.ok().put("page", new PageUtils(page));
+    }
 
 
 }

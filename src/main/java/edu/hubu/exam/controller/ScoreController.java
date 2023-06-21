@@ -5,10 +5,16 @@ import edu.hubu.common.utils.R;
 import edu.hubu.exam.dto.ManualReviewDto;
 import edu.hubu.exam.entity.ScoreEntity;
 import edu.hubu.exam.service.ScoreService;
+import org.apache.poi.xssf.usermodel.XSSFRow;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 
@@ -73,6 +79,52 @@ public class ScoreController {
         return R.ok().put("page", page);
     }
 
+    /**
+     * 查看测评的所有用户列表
+     */
+    @GetMapping("/list/{examId}")
+    public R list(@RequestParam Map<String, Object> params, @PathVariable Long examId) {
+        PageUtils page = scoreService.listPage(params, examId);
+
+        return R.ok().put("page", page);
+    }
+
+    /**
+     * 下载测评的所有用户列表
+     */
+    @GetMapping("/list/download")
+    public void download(HttpServletResponse response) throws IOException {
+        response.setContentType("application/vnd.ms-excel");
+        response.setHeader("Content-Disposition", "attachment;filename=users.xlsx");
+
+        // 创建工作簿
+        XSSFWorkbook workbook = new XSSFWorkbook();
+
+        // 写入数据
+        XSSFSheet sheet = workbook.createSheet("用户测评信息");
+        // 设置表头
+        XSSFRow head = sheet.createRow(0);
+        head.createCell(0).setCellValue("用户ID");
+        head.createCell(1).setCellValue("分数");
+        head.createCell(2).setCellValue("开始时间");
+        head.createCell(3).setCellValue("结束时间");
+
+        List<ScoreEntity> entities = scoreService.list();  // 获取用户数据
+        int rowNum = 0;
+        for (ScoreEntity entity: entities) {
+            XSSFRow row = sheet.createRow(rowNum++);
+            row.createCell(0).setCellValue(entity.getUserId());
+            row.createCell(1).setCellValue(entity.getScore());
+            row.createCell(2).setCellValue(entity.getStartTime());
+            row.createCell(3).setCellValue(entity.getFinishTime());
+        }
+
+        // 将Excel文件写入响应输出流
+        workbook.write(response.getOutputStream());
+
+        // 关闭工作簿
+        workbook.close();
+    }
 
 
     /**

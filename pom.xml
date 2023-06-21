@@ -19,6 +19,13 @@
 
     <dependencies>
 
+        <!--生成excel文件-->
+        <dependency>
+            <groupId>org.apache.poi</groupId>
+            <artifactId>poi-ooxml</artifactId>
+            <version>4.1.0</version>
+        </dependency>
+
         <!--        生成二维码用-->
         <dependency>
             <groupId>com.google.zxing</groupId>

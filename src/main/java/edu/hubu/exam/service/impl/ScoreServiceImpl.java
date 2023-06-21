@@ -166,4 +166,15 @@ public class ScoreServiceImpl extends ServiceImpl<ScoreDao, ScoreEntity> impleme
         return new PageUtils(page);
     }
 
+    @Override
+    public PageUtils listPage(Map<String, Object> params, Long examId) {
+        IPage<ScoreEntity> page = this.page(
+                new Query<ScoreEntity>().getPage(params),
+                new QueryWrapper<ScoreEntity>()
+                        .eq("exam_id", examId)
+        );
+
+        return new PageUtils(page);
+    }
+
 }

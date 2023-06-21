@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.google.zxing.WriterException;
 import edu.hubu.common.utils.PageUtils;
 import edu.hubu.common.utils.R;
+import edu.hubu.exam.dto.ExamSearchDto;
 import edu.hubu.exam.entity.ExamEntity;
 
 import java.io.IOException;
@@ -22,5 +23,6 @@ public interface ExamService extends IService<ExamEntity> {
 
     R getQRCode(Long id);
 
+    R search(Map<String, Object> params, ExamSearchDto examSearchDto);
 }
 

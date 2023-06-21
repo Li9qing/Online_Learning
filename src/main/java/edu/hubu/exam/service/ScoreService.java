@@ -26,5 +26,7 @@ public interface ScoreService extends IService<ScoreEntity> {
     PageUtils listPassedPage(Map<String, Object> params, Long examId);
 
     PageUtils listFailedPage(Map<String, Object> params, Long examId);
+
+    PageUtils listPage(Map<String, Object> params, Long examId);
 }
 
