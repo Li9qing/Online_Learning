@@ -21,5 +21,6 @@ public interface ExamService extends IService<ExamEntity> {
     ExamEntity release(ExamEntity exam) throws IOException, WriterException;
 
     R getQRCode(Long id);
+
 }
 

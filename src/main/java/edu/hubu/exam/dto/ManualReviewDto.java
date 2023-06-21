@@ -5,13 +5,13 @@ import lombok.Data;
 import java.io.Serializable;
 
 /**
- * ManualReview for
+ * ManualReviewDto for
  *
  * @Author yruns
  * @Version 2023/6/21
  */
 @Data
-public class ManualReview implements Serializable {
+public class ManualReviewDto implements Serializable {
     private static final long serialVersionUID = 1L;
     /**
      * 评测id

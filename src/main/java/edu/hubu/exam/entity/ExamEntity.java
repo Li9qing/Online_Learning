@@ -39,7 +39,7 @@ public class ExamEntity implements Serializable {
     /**
      * 通过分数
      */
-    private Double passScore;
+    private Integer passScore;
     /**
      * 限时分钟数
      */

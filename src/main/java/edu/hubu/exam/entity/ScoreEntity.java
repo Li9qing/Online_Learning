@@ -20,7 +20,6 @@ public class ScoreEntity implements Serializable {
     /**
      * 测评id
      */
-    @TableId
     private Long examId;
     /**
      * 用户id
@@ -29,7 +28,7 @@ public class ScoreEntity implements Serializable {
     /**
      * 成绩
      */
-    private Double score;
+    private Integer score;
     /**
      * 开始时间
      */

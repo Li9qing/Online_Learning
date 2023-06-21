@@ -7,7 +7,7 @@ import edu.hubu.common.utils.PageUtils;
 import edu.hubu.common.utils.Query;
 import edu.hubu.common.utils.R;
 import edu.hubu.exam.dao.ScoreDao;
-import edu.hubu.exam.dto.ManualReview;
+import edu.hubu.exam.dto.ManualReviewDto;
 import edu.hubu.exam.entity.QuestionEntity;
 import edu.hubu.exam.entity.QuestionPaperEntity;
 import edu.hubu.exam.entity.ScoreEntity;
@@ -98,15 +98,15 @@ public class ScoreServiceImpl extends ServiceImpl<ScoreDao, ScoreEntity> impleme
     }
 
     @Override
-    public R manualReview(ManualReview manualReview) {
+    public R manualReview(ManualReviewDto manualReviewDto) {
         try {
             SubmitEntity submit = submitService.query()
-                    .eq("exam_id", manualReview.getExamId())
-                    .eq("question_id", manualReview.getQuestionId())
-                    .eq("user_id", manualReview.getUserId())
+                    .eq("exam_id", manualReviewDto.getExamId())
+                    .eq("question_id", manualReviewDto.getQuestionId())
+                    .eq("user_id", manualReviewDto.getUserId())
                     .one();
-            submit.setScore(manualReview.getScore());
-            submit.setComment(manualReview.getComment());
+            submit.setScore(manualReviewDto.getScore());
+            submit.setComment(manualReviewDto.getComment());
 
             submitService.updateById(submit);
             return R.ok();
@@ -114,6 +114,56 @@ public class ScoreServiceImpl extends ServiceImpl<ScoreDao, ScoreEntity> impleme
             return R.error("评分出错");
         }
 
+    }
+
+    @Override
+    public R submitExam(Long examId, Long userId) {
+        List<SubmitEntity> submits = submitService.query()
+                .eq("exam_id", examId)
+                .eq("user_id", userId)
+                .list();
+
+        ScoreEntity scoreEntity = new ScoreEntity();
+        int score = 0;
+        for (SubmitEntity submit : submits) {
+            score += submit.getScore() != null ? submit.getScore() : 0;
+        }
+        scoreEntity.setExamId(examId);
+        scoreEntity.setUserId(userId);
+        scoreEntity.setScore(score);
+        // todo 从redis中获取开始时间和结束时间
+        scoreEntity.setStartTime(new Date());
+        scoreEntity.setFinishTime(new Date());
+
+        // 将该记录写入到数据库
+        this.save(scoreEntity);
+        return R.ok();
+    }
+
+    @Override
+    public PageUtils listPassedPage(Map<String, Object> params, Long examId) {
+        Integer passScore = examService.getById(examId).getPassScore();
+        IPage<ScoreEntity> page = this.page(
+                new Query<ScoreEntity>().getPage(params),
+                new QueryWrapper<ScoreEntity>()
+                        .eq("exam_id", examId)
+                        .ge("score", passScore)
+        );
+
+        return new PageUtils(page);
+    }
+
+    @Override
+    public PageUtils listFailedPage(Map<String, Object> params, Long examId) {
+        Integer passScore = examService.getById(examId).getPassScore();
+        IPage<ScoreEntity> page = this.page(
+                new Query<ScoreEntity>().getPage(params),
+                new QueryWrapper<ScoreEntity>()
+                        .eq("exam_id", examId)
+                        .lt("score", passScore)
+        );
+
+        return new PageUtils(page);
     }
 
 }
