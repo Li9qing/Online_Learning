@@ -20,14 +20,16 @@ public class MvcConfig implements WebMvcConfigurer {
                         "/member/**/login",
                         "/member/**/register",
                         "/**/**/public/**"
-                ); // 放行登陆和注册页面
+                ).order(0); // 放行登陆和注册页面
 
         // 统一拦截测验模块的题目crud功能
         registry.addInterceptor(new ExamInterceptor())
-                .addPathPatterns("/exam/question/**")
-                .addPathPatterns("/exam/paper/**")
+                .addPathPatterns("/exam/**/*")
                 .excludePathPatterns("/exam/submit/user/**")
-                .excludePathPatterns("/exam/comment/user/**");
+                .excludePathPatterns("/exam/comment/user/**")
+                .excludePathPatterns(
+                        "/**/**/public/**"
+                ).order(1);
 
     }
 }
