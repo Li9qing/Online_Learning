@@ -18,15 +18,14 @@ public class MvcConfig implements WebMvcConfigurer {
                 .addPathPatterns("/**/*") // 禁止所有的非登陆页面
                 .excludePathPatterns(
                         "/member/**/login",
-                        "/member/**/register"
+                        "/member/**/register",
+                        "/**/**/public/**"
                 ); // 放行登陆和注册页面
 
         // 统一拦截测验模块的题目crud功能
         registry.addInterceptor(new ExamInterceptor())
                 .addPathPatterns("/exam/question/**")
                 .addPathPatterns("/exam/paper/**")
-                .excludePathPatterns("/exam/comment/list/**")   // 用户可以访问
-                .excludePathPatterns("/exam/test/public/**")
                 .excludePathPatterns("/exam/submit/user/**")
                 .excludePathPatterns("/exam/comment/user/**");
 

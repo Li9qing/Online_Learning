@@ -32,7 +32,7 @@ public class ExamCommentController {
     /**
      * 获取测评下的所有评论（分页）
      */
-    @GetMapping("/list/{id}")
+    @GetMapping("/public/list/{id}")
     public R list(@RequestParam Map<String, Object> params, @PathVariable("id") Long examId) {
         PageUtils page = examCommentService.queryPage(params, examId);
 
