@@ -7,7 +7,7 @@ import edu.hubu.common.utils.PageUtils;
 import edu.hubu.common.utils.Query;
 import edu.hubu.common.utils.R;
 import edu.hubu.exam.dao.ScoreDao;
-import edu.hubu.exam.dto.ManualReviewDto;
+import edu.hubu.exam.entity.dto.ManualReviewDto;
 import edu.hubu.exam.entity.QuestionEntity;
 import edu.hubu.exam.entity.QuestionPaperEntity;
 import edu.hubu.exam.entity.ScoreEntity;

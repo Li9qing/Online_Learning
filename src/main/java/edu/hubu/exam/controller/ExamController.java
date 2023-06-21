@@ -3,7 +3,7 @@ package edu.hubu.exam.controller;
 import com.google.zxing.WriterException;
 import edu.hubu.common.utils.PageUtils;
 import edu.hubu.common.utils.R;
-import edu.hubu.exam.dto.ExamSearchDto;
+import edu.hubu.exam.entity.dto.ExamSearchDto;
 import edu.hubu.exam.entity.ExamEntity;
 import edu.hubu.exam.service.ExamService;
 import edu.hubu.exam.service.ScoreService;
@@ -90,6 +90,13 @@ public class ExamController {
         return examService.search(params, examSearchDto);
     }
 
+    /**
+     * 查看测评详细信息，包括测评名称，测评分类，测评限制时间，测评通过分数，其他用户对测评的评价。
+     */
+    @GetMapping("/public/detail/{examId}")
+    public R detail(@RequestParam Map<String, Object> params, @PathVariable Long examId) {
+        return examService.detail(params, examId);
+    }
 
 
     /**

@@ -3,7 +3,7 @@ package edu.hubu.exam.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import edu.hubu.common.utils.PageUtils;
 import edu.hubu.common.utils.R;
-import edu.hubu.exam.dto.ManualReviewDto;
+import edu.hubu.exam.entity.dto.ManualReviewDto;
 import edu.hubu.exam.entity.ScoreEntity;
 
 import java.util.Map;

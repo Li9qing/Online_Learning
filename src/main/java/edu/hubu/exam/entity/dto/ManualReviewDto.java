@@ -1,4 +1,4 @@
-package edu.hubu.exam.dto;
+package edu.hubu.exam.entity.dto;
 
 import lombok.Data;
 

@@ -7,12 +7,13 @@ import com.google.zxing.WriterException;
 import edu.hubu.common.exception.CustomException;
 import edu.hubu.common.utils.*;
 import edu.hubu.exam.dao.ExamDao;
-import edu.hubu.exam.dto.ExamSearchDto;
+import edu.hubu.exam.entity.ExamCommentEntity;
+import edu.hubu.exam.entity.dto.ExamSearchDto;
 import edu.hubu.exam.entity.ExamEntity;
+import edu.hubu.exam.entity.vo.ExamDetailVo;
+import edu.hubu.exam.service.ExamCommentService;
 import edu.hubu.exam.service.ExamService;
-import io.minio.UploadObjectArgs;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
@@ -20,6 +21,7 @@ import org.springframework.stereotype.Service;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
@@ -30,7 +32,11 @@ public class ExamServiceImpl extends ServiceImpl<ExamDao, ExamEntity> implements
     @Autowired
     private StringRedisTemplate redisTemplate;
 
-    @Autowired MinioUtils minioUtils;
+    @Autowired
+    private MinioUtils minioUtils;
+
+    @Autowired
+    private ExamCommentService examCommentService;
 
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
@@ -110,6 +116,17 @@ public class ExamServiceImpl extends ServiceImpl<ExamDao, ExamEntity> implements
         );
 
         return R.ok().put("page", new PageUtils(page));
+    }
+
+    @Override
+    public R detail(Map<String, Object> params, Long examId) {
+        ExamEntity exam = this.getById(examId);
+        PageUtils comments = examCommentService.queryPage(params, examId);
+        ExamDetailVo detailVo = new ExamDetailVo();
+        detailVo.setExam(exam);
+        detailVo.setComments(comments);
+
+        return R.ok().put("detail", detailVo);
     }
 
 
