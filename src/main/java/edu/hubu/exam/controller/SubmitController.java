@@ -2,8 +2,10 @@ package edu.hubu.exam.controller;
 
 import edu.hubu.common.utils.PageUtils;
 import edu.hubu.common.utils.R;
+import edu.hubu.common.utils.UserHolder;
 import edu.hubu.exam.entity.SubmitEntity;
 import edu.hubu.exam.service.SubmitService;
+import edu.hubu.member.dto.UserDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -52,13 +54,16 @@ public class SubmitController {
     /**
      * 提交该题目的答案
      */
-    @PostMapping("/save")
+    @PostMapping("/user/save")
     public R save(@RequestBody SubmitEntity submit) {
+
         submit.setSubmitTime(new Date());
         submitService.save(submit);
 
         return R.ok();
     }
+
+
 
 
 

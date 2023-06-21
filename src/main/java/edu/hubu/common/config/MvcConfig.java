@@ -25,8 +25,10 @@ public class MvcConfig implements WebMvcConfigurer {
         registry.addInterceptor(new ExamInterceptor())
                 .addPathPatterns("/exam/question/**")
                 .addPathPatterns("/exam/paper/**")
-                .excludePathPatterns("/exam/comment/**")   // 用户可以访问
-                .excludePathPatterns("/exam/test/public/**");
+                .excludePathPatterns("/exam/comment/list/**")   // 用户可以访问
+                .excludePathPatterns("/exam/test/public/**")
+                .excludePathPatterns("/exam/submit/user/**")
+                .excludePathPatterns("/exam/comment/user/**");
 
     }
 }
