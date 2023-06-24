@@ -3,6 +3,7 @@ package edu.hubu.common.config;
 import edu.hubu.common.interceptor.ExamInterceptor;
 import edu.hubu.common.interceptor.GroupInterceptor;
 import edu.hubu.common.interceptor.JwtInterceptor;
+import edu.hubu.common.interceptor.MessageInterceptor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
@@ -39,6 +40,15 @@ public class MvcConfig implements WebMvcConfigurer {
                 .excludePathPatterns(
                         "/**/**/public/**"
                 ).order(2);
+
+        // 统一拦截消息模块的题目crud功能
+        registry.addInterceptor(new MessageInterceptor())
+                .addPathPatterns("/message/**/*")
+                .excludePathPatterns("/**/**/user/**")
+                .excludePathPatterns(
+                        "/**/**/public/**"
+                ).order(2);
+
 
     }
 }

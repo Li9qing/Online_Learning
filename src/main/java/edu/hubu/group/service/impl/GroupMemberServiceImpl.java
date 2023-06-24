@@ -9,6 +9,10 @@ import edu.hubu.group.entity.GroupMemberEntity;
 import edu.hubu.group.service.GroupMemberService;
 import edu.hubu.group.service.GroupService;
 import edu.hubu.member.dto.UserDto;
+import edu.hubu.message.entity.MessageAttrEntity;
+import edu.hubu.message.entity.MessageEntity;
+import edu.hubu.message.service.MessageAttrService;
+import edu.hubu.message.service.MessageService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -28,6 +32,12 @@ public class GroupMemberServiceImpl extends ServiceImpl<GroupMemberDao, GroupMem
 
     @Autowired
     private StringRedisTemplate redisTemplate;
+
+    @Autowired
+    private MessageService messageService;
+
+    @Autowired
+    private MessageAttrService messageAttrService;
 
     @Override
     public PageUtils queryPage(Map<String, Object> params, Long groupId) {
@@ -60,8 +70,18 @@ public class GroupMemberServiceImpl extends ServiceImpl<GroupMemberDao, GroupMem
 
             // 向群组负责人发送信息
             Long userId = groupService.getById(groupId).getUserId();
-            redisTemplate.opsForZSet().add(USER_INBOX + userId.toString(), user.getId().toString(),
-                    System.currentTimeMillis());
+//            redisTemplate.opsForZSet().add(USER_INBOX + userId.toString(), user.getId().toString(),
+//                    System.currentTimeMillis());
+            MessageEntity messageEntity = new MessageEntity();
+            messageEntity.setContent("用户" + user.getNickName() + "申请加入群组");
+            messageEntity.setType(0);
+            messageService.save(messageEntity);
+
+            MessageAttrEntity messageAttrEntity = new MessageAttrEntity();
+            messageAttrEntity.setSender(user.getId());
+            messageAttrEntity.setRecipient(userId);
+            messageAttrEntity.setMessageId(messageEntity.getId());
+            messageAttrService.save(messageAttrEntity);
 
             return R.ok();
         }

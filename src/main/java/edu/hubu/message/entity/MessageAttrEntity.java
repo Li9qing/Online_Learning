@@ -1,5 +1,6 @@
 package edu.hubu.message.entity;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
@@ -19,16 +20,16 @@ public class MessageAttrEntity implements Serializable {
     /**
      *
      */
-    @TableId
     private Long messageId;
     /**
      * 发送方
      */
-    private Long from;
+    // 设置数据库字段名
+    private Long sender;
     /**
      * 接收方
      */
-    private Long to;
+    private Long recipient;
     /**
      * 是否已读
      */

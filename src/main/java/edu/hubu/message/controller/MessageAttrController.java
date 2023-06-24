@@ -22,15 +22,7 @@ public class MessageAttrController {
     @Autowired
     private MessageAttrService messageAttrService;
 
-    /**
-     * 列表
-     */
-    @RequestMapping("/list")
-    public R list(@RequestParam Map<String, Object> params) {
-        PageUtils page = messageAttrService.queryPage(params);
 
-        return R.ok().put("page", page);
-    }
 
 
     /**
