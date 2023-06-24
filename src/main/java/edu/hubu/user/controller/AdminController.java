@@ -4,12 +4,12 @@ import java.util.Arrays;
 import java.util.Map;
 
 // import org.apache.shiro.authz.annotation.RequiresPermissions;
+import edu.hubu.user.entity.AdminDTO;
+import edu.hubu.user.entity.UserDTO;
+import edu.hubu.user.entity.UserEntity;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import edu.hubu.user.entity.AdminEntity;
 import edu.hubu.user.service.AdminService;
@@ -31,6 +31,42 @@ import edu.hubu.common.utils.R;
 public class AdminController {
     @Autowired
     private AdminService adminService;
+
+
+    @PostMapping("/login")
+    public R login(@RequestBody AdminEntity admin) {
+        System.out.println("get Post");
+        System.out.println(admin.toString());
+        String token = adminService.login(admin);
+        if(token.equals("err")){
+            return R.error(20001,"no such user!");
+        }
+        return R.ok().put("token", token);
+    }
+//    @ApiOperation("注册")
+//    @PostMapping("/register")
+//    public R register(@RequestBody UserEntity user) {
+//        String re = adminService.register(user);
+//        if(re.equals("err")){
+//            return R.error(20001,"Invalid account!");
+//        }
+//        return R.ok().put("token",re);
+//    }
+
+    @ApiOperation("获取用户信息")
+    @GetMapping("info")
+    public R info(String token) {
+        if (token == null) R.ok().put("user", null);
+        AdminDTO admin = adminService.getAdminInfo(token);
+        return R.ok().put("admin", admin);
+    }
+
+    @ApiOperation("登出")
+    @GetMapping("logout")
+    public R logout(@RequestParam String token) {
+        return R.error(50008," log out");
+    }
+
 
     /**
      * 列表

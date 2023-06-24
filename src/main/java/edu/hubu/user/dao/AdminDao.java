@@ -3,7 +3,6 @@ package edu.hubu.user.dao;
 import edu.hubu.user.entity.AdminEntity;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
-
 /**
  * 
  * 
