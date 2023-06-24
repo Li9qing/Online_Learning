@@ -17,5 +17,8 @@ public interface GroupService extends IService<GroupEntity> {
     PageUtils queryPage(Map<String, Object> params);
 
     R uploadAvatar(Long groupId, String filePath);
+
+    R queryPageByKey(Map<String, Object> params, String key);
+
 }
 

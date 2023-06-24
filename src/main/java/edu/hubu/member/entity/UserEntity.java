@@ -2,6 +2,7 @@ package edu.hubu.member.entity;
 
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
@@ -39,6 +40,7 @@ public class UserEntity implements Serializable {
     /**
      * 封禁状态 1封禁 0正常
      */
+    @TableLogic(value = "0", delval = "1")
     private Integer status;
     /**
      * 是否有教师权限 1有 0无

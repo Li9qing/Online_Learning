@@ -71,4 +71,16 @@ public class GroupServiceImpl extends ServiceImpl<GroupDao, GroupEntity> impleme
         return R.ok();
     }
 
+    @Override
+    public R queryPageByKey(Map<String, Object> params, String key) {
+        IPage<GroupEntity> page = this.page(
+                new Query<GroupEntity>().getPage(params),
+                new QueryWrapper<GroupEntity>()
+                        .like("description", key)
+        );
+
+        return R.ok().put("page", new PageUtils(page));
+    }
+
+
 }

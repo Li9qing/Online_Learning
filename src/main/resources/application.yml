@@ -2,6 +2,10 @@ server:
   port: 9010
 
 spring:
+  servlet:
+    multipart: # 不限制文件上传大小
+      max-file-size: -1
+      max-request-size: -1
   datasource:
     username: root
     password: root

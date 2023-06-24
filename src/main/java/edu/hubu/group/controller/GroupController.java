@@ -72,9 +72,9 @@ public class GroupController {
 
 
     /**
-     * 列表
+     * 查看群组
      */
-    @RequestMapping("/list")
+    @GetMapping("/user/list")
     public R list(@RequestParam Map<String, Object> params) {
         PageUtils page = groupService.queryPage(params);
 
@@ -83,14 +83,26 @@ public class GroupController {
 
 
     /**
-     * 信息
+     * 查看群组的详细信息
      */
-    @RequestMapping("/info/{id}")
+    @GetMapping("/user/info/{id}")
     public R info(@PathVariable("id") Long id) {
         GroupEntity group = groupService.getById(id);
 
         return R.ok().put("group", group);
     }
+
+    /**
+     * 搜索群组
+     */
+    @GetMapping("/user/search")
+    public R search(@RequestParam Map<String, Object> params) {
+
+        String key = params.get("key").toString();
+        return groupService.queryPageByKey(params, key);
+    }
+
+
 
 
 

@@ -1,15 +1,19 @@
 package edu.hubu.common.utils;
 
+import io.minio.GetObjectArgs;
 import io.minio.MinioClient;
 import io.minio.RemoveObjectArgs;
 import io.minio.UploadObjectArgs;
-import lombok.Data;
+import io.minio.errors.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 
+import java.io.*;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -102,4 +106,25 @@ public class MinioUtils {
     }
 
 
+    public InputStream downloadFileFromMinio(String objectName) throws ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
+
+        // 根据文件后缀名选择bucket
+        String bucket;
+        if (objectName.endsWith(".mp4")) {
+            bucket = videoFilesBucket;
+        } else {
+            bucket = mediaFilesBucket;
+        }
+
+        // 下载文件的信息
+        GetObjectArgs getObjectArgs = GetObjectArgs.builder()
+                .bucket(bucket)
+                .object(objectName)
+                .build();
+
+        // 获取文件
+        FilterInputStream filterInputStream = minioClient.getObject(getObjectArgs);
+        // 向前端输出文件
+        return filterInputStream;
+    }
 }

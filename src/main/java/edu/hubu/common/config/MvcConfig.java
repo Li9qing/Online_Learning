@@ -35,6 +35,7 @@ public class MvcConfig implements WebMvcConfigurer {
         // 统一拦截群组模块的题目crud功能
         registry.addInterceptor(new GroupInterceptor())
                 .addPathPatterns("/group/**/*")
+                .excludePathPatterns("/**/**/user/**")
                 .excludePathPatterns(
                         "/**/**/public/**"
                 ).order(2);

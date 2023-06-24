@@ -18,9 +18,13 @@ public class GroupMemberEntity implements Serializable {
     private static final long serialVersionUID = 1L;
 
     /**
-     * 组内用户id
+     * id
      */
     @TableId
+    private Long id;
+    /**
+     * 组内用户id
+     */
     private Long userId;
     /**
      * 入组时间
@@ -34,5 +38,12 @@ public class GroupMemberEntity implements Serializable {
      * 总学习时长
      */
     private Integer studyTime;
-
+    /**
+     * 状态 0待审核 1拒绝 2通过
+     */
+    private Integer status;
+    /**
+     * 记录创建时间
+     */
+    private Date createTime;
 }

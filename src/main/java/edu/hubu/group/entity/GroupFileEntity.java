@@ -38,5 +38,8 @@ public class GroupFileEntity implements Serializable {
      * 所属群组id
      */
     private Long groupId;
-
+    /**
+     * 是否允许下载  0不允许，1允许
+     */
+    private Integer status;
 }

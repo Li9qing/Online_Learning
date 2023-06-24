@@ -23,6 +23,16 @@ public class ForumController {
     private ForumService forumService;
 
     /**
+     * 发表话题
+     */
+    @RequestMapping("/save")
+    public R save(@RequestBody ForumEntity forum) {
+        forumService.save(forum);
+
+        return R.ok();
+    }
+
+    /**
      * 列表
      */
     @RequestMapping("/list")
@@ -43,15 +53,7 @@ public class ForumController {
         return R.ok().put("forum", forum);
     }
 
-    /**
-     * 保存
-     */
-    @RequestMapping("/save")
-    public R save(@RequestBody ForumEntity forum) {
-        forumService.save(forum);
 
-        return R.ok();
-    }
 
     /**
      * 修改

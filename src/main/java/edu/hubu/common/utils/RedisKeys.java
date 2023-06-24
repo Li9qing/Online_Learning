@@ -20,6 +20,12 @@ public class RedisKeys {
      */
     public static final String EXAM_QRCODE = "exam:qr:";
 
+    /**
+     * 群组申请
+     */
+    public static final String GROUP_AUDIT = "group:audit:";
+    public static final String USER_INBOX = "user:inbox:";
+
     public static String getSysConfigKey(String key) {
         return "sys:config:" + key;
     }

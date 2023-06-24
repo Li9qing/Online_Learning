@@ -17,10 +17,20 @@ import java.util.Map;
  * @date 2023-06-19 20:32:03
  */
 @RestController
-@RequestMapping("group/groupplan")
+@RequestMapping("group/plan")
 public class GroupPlanController {
     @Autowired
     private GroupPlanService groupPlanService;
+
+    /**
+     * 添加学习计划
+     */
+    @PostMapping("/save")
+    public R save(@RequestBody GroupPlanEntity groupPlan) {
+        groupPlanService.save(groupPlan);
+
+        return R.ok();
+    }
 
     /**
      * 列表
@@ -43,15 +53,7 @@ public class GroupPlanController {
         return R.ok().put("groupPlan", groupPlan);
     }
 
-    /**
-     * 保存
-     */
-    @RequestMapping("/save")
-    public R save(@RequestBody GroupPlanEntity groupPlan) {
-        groupPlanService.save(groupPlan);
 
-        return R.ok();
-    }
 
     /**
      * 修改
