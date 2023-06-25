@@ -13,6 +13,7 @@ import edu.hubu.group.entity.GroupMemberEntity;
 import edu.hubu.message.entity.MessageAttrEntity;
 import edu.hubu.user.entity.UserDTO;
 import edu.hubu.user.entity.UserEntity;
+import edu.hubu.user.entity.UserNoteEntity;
 
 import java.util.List;
 import java.util.Map;
@@ -57,5 +58,7 @@ public interface UserService extends IService<UserEntity> {
     UserEntity findUserInfo(String username);
 
     boolean delete(String id);
+
+    boolean updateNote(UserNoteEntity note);
 }
 

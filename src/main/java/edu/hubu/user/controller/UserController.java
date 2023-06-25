@@ -13,6 +13,7 @@ import edu.hubu.exam.entity.SubmitEntity;
 import edu.hubu.user.entity.Result;
 
 import edu.hubu.user.entity.UserDTO;
+import edu.hubu.user.entity.UserNoteEntity;
 import edu.hubu.user.interceptor.Login;
 import edu.hubu.user.interceptor.Register;
 import io.swagger.annotations.ApiOperation;
@@ -170,9 +171,6 @@ public class UserController {
         return R.ok().put("resujlt", var);
     }
 
-    /**
-     * 删除
-     */
     @RequestMapping("/ban")
     // @RequiresPermissions("exam:user:delete")
     public R delete(@RequestBody String id){
@@ -245,6 +243,14 @@ public class UserController {
         if(courseId==null||lessonId==null||userId==null) return EMPTYdata();
 
         return BOOLresult(userService.delNote(courseId,lessonId,userId));
+    }
+    @PostMapping("/updNote")
+    public R updNote(@RequestBody UserNoteEntity note){
+        System.out.println("get update note :"+note);
+        if(note == null||note.getUserId()==null)return EMPTYdata();
+        boolean var =userService.updateNote(note);
+//        PageUtils page = userService.queryPage(new HashMap<String,Object>());
+        return R.ok().put("resujlt", var);
     }
     @GetMapping("/Course")
     public R getCourse(String token){

@@ -1,6 +1,8 @@
 package edu.hubu.user.service.impl;
 
 import com.alibaba.fastjson.JSON;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.extension.conditions.update.UpdateChainWrapper;
 import edu.hubu.course.entity.*;
 import edu.hubu.course.service.CourseLessonService;
 import edu.hubu.course.service.impl.*;
@@ -162,6 +164,7 @@ public class UserServiceImpl extends ServiceImpl<UserDao, UserEntity> implements
         return n>0;
     }
 
+
     @Override
     public UserEntity getUserDetail(String token) {
         String userJson = stringRedisTemplate.opsForValue().get(token);
@@ -278,6 +281,28 @@ public class UserServiceImpl extends ServiceImpl<UserDao, UserEntity> implements
     }
 
     @Override
+    public boolean updateNote(UserNoteEntity note) {
+        QueryWrapper<CourseNoteEntity> q1 = new QueryWrapper<>();
+        q1.eq("user_id",note.getUserId());
+        q1.eq("course_id",note.getCourseId());
+        q1.eq("lesson_id",note.getLessonId());
+
+
+        return Note.update(praseNote(note),q1);
+    }
+
+    private CourseNoteEntity praseNote(UserNoteEntity note) {
+        CourseNoteEntity e1 = new CourseNoteEntity();
+        e1.setCourseId(note.getCourseId());
+        e1.setUserId(note.getUserId());
+        e1.setLessonId(note.getLessonId());
+        e1.setContent(note.getContent());
+        e1.setCreateTime(note.getCreateTime());
+        e1.setUpdateTime(note.getUpdateTime());
+        return e1;
+    }
+
+    @Override
     public PageUtils NotePage(Map<String, Object> params) {
         QueryWrapper<CourseNoteEntity> e1 = new QueryWrapper<>();
         e1.eq("user_id",params.get("userId"));
@@ -287,7 +312,7 @@ public class UserServiceImpl extends ServiceImpl<UserDao, UserEntity> implements
         );
         List<CourseNoteEntity> RAW = page.getRecords();
         if(RAW.size()==0){
-            new PageUtils(null,0,0,0);
+            return new PageUtils(null,0,0,0);
         }
         List<Long> Courseid = RAW.stream().map(CourseNoteEntity::getCourseId).collect(toList());
         List<Long> Lessonid = RAW.stream().map(CourseNoteEntity::getLessonId).collect(toList());
@@ -302,7 +327,7 @@ public class UserServiceImpl extends ServiceImpl<UserDao, UserEntity> implements
         List<UserNoteEntity> RESULT = new ArrayList<>();
         for(int i =0;i<RAW.size();i++){
 
-            RESULT.add(i, new UserNoteEntity(RAW.get(i),e2.get(i),e3.get(i)));
+            RESULT.add(i, UserNoteEntity.make(RAW.get(i),e2.get(i),e3.get(i)));
         }
 
         page.setTotal(page.getRecords().size());
