@@ -15,5 +15,5 @@ import org.apache.ibatis.annotations.Mapper;
 @Mapper
 public interface UserDao extends BaseMapper<UserEntity> {
 	@Delete("delete from user WHERE id = #{id}")
-    int delDATAbyid(String id);
+    int delDATAbyid(Long id);
 }

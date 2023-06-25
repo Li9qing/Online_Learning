@@ -23,8 +23,8 @@ public class UserEntity implements Serializable {
 	/**
 	 * 
 	 */
-	@ApiModelProperty(value = "管理员id")
-	@TableId(value = "id", type = IdType.ID_WORKER_STR)
+//	@ApiModelProperty(value = "管理员id")
+	@TableId(value = "id", type = IdType.ASSIGN_ID)
 	private Long id;
 	/**
 	 * 用户名
@@ -40,7 +40,7 @@ public class UserEntity implements Serializable {
 	 * 封禁状态 1封禁 0正常
 	 */
 	@ApiModelProperty(value = "是否删除")
-	@TableLogic(value = "0",delval = "1")
+//	@TableLogic(value = "0",delval = "1")
 	private Integer status;
 	/**
 	 * 是否有教师权限 1有 0无

@@ -59,6 +59,7 @@ public class UserController {
     @PostMapping("/register")
     public R register(@RequestBody UserEntity user) {
         System.out.println(user);
+        PraseAccess(user);
         String re = userService.register(user);
         if(re.equals("err")){
             return R.error(ERROR,"Invalid account!");
@@ -166,9 +167,22 @@ public class UserController {
     public R update(@RequestBody UserEntity user){
         System.out.println("get update USER :"+user);
         if(user == null||user.getId()==null)return EMPTYdata();
+
+        PraseAccess(user);
+        System.out.println(user);
 		boolean var =userService.updateById(user);
 //        PageUtils page = userService.queryPage(new HashMap<String,Object>());
         return R.ok().put("resujlt", var);
+    }
+
+    private void PraseAccess(UserEntity user) {
+        if(user.getTeacherAccess().contains("true")||user.getTeacherAccess().contains("false")){
+            if(user.getTeacherAccess().equals("true")){
+                user.setTeacherAccess("1");
+            }else{
+                user.setTeacherAccess("0");
+            }
+        }
     }
 
     @RequestMapping("/ban")
@@ -179,7 +193,12 @@ public class UserController {
 
         return R.ok();
     }
-
+    @RequestMapping("/BatchDel")
+    public R BatchDel(@RequestBody Long [] ids){
+        if(ids.length==0)return EMPTYdata();
+        boolean var =userService.removeByIds(Arrays.asList(ids));
+        return R.ok().put("Result",var);
+    }
     @Login
     @GetMapping("/del")
     // @RequiresPermissions("exam:user:delete")
@@ -188,6 +207,7 @@ public class UserController {
 //        Long[] ids = {Long.parseLong(id)};
 //        delete(ids);
         System.out.println("get a id to delete lol"+id);
+        System.out.println(Long.valueOf(id));
         boolean var = userService.delete(id);
         return BOOLresult(var);
     }
@@ -224,17 +244,19 @@ public class UserController {
         if(token == null){
             return ERRtoken();
         }
-        Map<String, Object> params = PATCHparamByuserId(currentPage, totalPage, token);
+        UserDTO d1 = userService.getUserInfo(token);
+        if(d1==null)return ERRtoken();
+        Map<String, Object> params = PATCHparamByuserId(currentPage, totalPage, d1.getId());
         PageUtils page = userService.NotePage(params);
         return R.ok().put("page", page);
     }
 
-    private Map<String, Object> PATCHparamByuserId(String currentPage, String totalPage, String token) {
+    private Map<String, Object> PATCHparamByuserId(String currentPage, String totalPage, String userId) {
         Map<String,Object> params = new HashMap<>();
         params.put("page", currentPage);
         params.put("limit", totalPage);
-        UserDTO d1 = userService.getUserInfo(token);
-        params.put("userId",d1.getId());
+
+        params.put("userId",userId);
         return params;
     }
     @GetMapping("/delNote")
@@ -252,6 +274,17 @@ public class UserController {
 //        PageUtils page = userService.queryPage(new HashMap<String,Object>());
         return R.ok().put("resujlt", var);
     }
+//    @GetMapping("/findNote")
+//    public R findNote(String coursename,String chapter,String token) {
+//        if(coursename == null || chapter == null||token==null){return  EMPTYdata();}
+//
+//        Map<String,Object> m1 = new HashMap<>();
+//        System.out.println(coursename + "__" + chapter + "__"+);
+//
+//
+//        return R.ok().put("page", page);
+//    }
+
     @GetMapping("/Course")
     public R getCourse(String token){
         if(token == null){
@@ -272,7 +305,9 @@ public class UserController {
         if(token == null){
             return ERRtoken();
         }
-        Map<String, Object> params = PATCHparamByuserId(currentPage, totalPage, token);
+        UserDTO d1 = userService.getUserInfo(token);
+        if(d1==null)return ERRtoken();
+        Map<String, Object> params = PATCHparamByuserId(currentPage, totalPage, d1.getId());
         PageUtils page = userService.CoursePage(params);
         return R.ok().put("page", page);
     }
@@ -297,7 +332,9 @@ public class UserController {
         if(token == null){
             return ERRtoken();
         }
-        Map<String, Object> params = PATCHparamByuserId(currentPage, totalPage, token);
+        UserDTO d1 = userService.getUserInfo(token);
+        if(d1==null)return ERRtoken();
+        Map<String, Object> params = PATCHparamByuserId(currentPage, totalPage, d1.getId());
         PageUtils page = userService.SubmitPage(params);
         return R.ok().put("page", page);
     }

@@ -27,6 +27,9 @@ import java.util.Map;
  */
 public interface UserService extends IService<UserEntity> {
 
+    static void PraseAccess(UserEntity user) {
+    }
+
     PageUtils queryPage(Map<String, Object> params);
     boolean delNote(String courseId,String lessonId,String userId);
     PageUtils NotePage(Map<String, Object> params);

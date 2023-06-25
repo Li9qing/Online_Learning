@@ -16,6 +16,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import javax.servlet.http.HttpServletRequest;
+import javax.swing.text.html.parser.Entity;
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -34,9 +35,12 @@ public class FileUploadController {
     public R ttt(){
         return R.error(2000,"try me");
     }
-    @PostMapping("/upload")
-    public R uploadFile(@RequestParam("user") UserEntity user, @RequestParam("file") MultipartFile file) {
+    @RequestMapping("/upload")
+    public R uploadFile(@RequestBody MultipartFile file,@RequestParam("token")String token) {
         // 根据业务逻辑处理文件上传和保存
+        if(file == null)return R.error(404,"no img");
+        UserEntity user = SERuser.getUserDetail(token);
+
         System.out.println("get update USER :"+user);
         UserEntity usr = SERuser.findUserInfo(user.getUsername());
         if(usr == null||usr.getId()==null)return R.error(404,"NO USER!");
@@ -46,10 +50,10 @@ public class FileUploadController {
         if (!file.isEmpty()) {
             try {
                 // 获取文件名
-                String fileName = file.getOriginalFilename();
+                String fileName =usr.getId()+  file.getOriginalFilename();
 
                 // 生成文件保存路径，例如在本地存储
-                String filePath = DIR +usr.getId()+ fileName;
+                String filePath = DIR + fileName;
 
                 // 将文件保存到指定路径
                 File dest = new File(filePath);

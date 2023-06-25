@@ -12,11 +12,13 @@ import edu.hubu.exam.service.impl.SubmitServiceImpl;
 import edu.hubu.group.entity.ForumCommentEntity;
 import edu.hubu.group.entity.GroupMemberEntity;
 import edu.hubu.message.entity.MessageAttrEntity;
+import edu.hubu.user.entity.UserCourseEntity;
 import edu.hubu.user.entity.UserDTO;
 import edu.hubu.user.entity.UserNoteEntity;
 import edu.hubu.user.exception.EduException;
 import edu.hubu.user.utils.JwtUtils;
 import edu.hubu.user.utils.MD5;
+import edu.hubu.user.utils.RandomUtil;
 import edu.hubu.user.utils.WrapperUtils;
 import org.apache.catalina.User;
 import org.springframework.beans.BeanUtils;
@@ -71,10 +73,12 @@ public class UserServiceImpl extends ServiceImpl<UserDao, UserEntity> implements
         String nick = user.getNickName();
         String username = user.getUsername();
         String password = user.getPassword();
-        String access = user.getTeacherAccess().equals("false") ? "0":"1";
-
-        System.out.println(username + "____________" + password+"___________"+access);
+        PraseAccess(user);
+        System.out.println(username + "____________" + password+"___________"+user.getTeacherAccess());
         System.out.println(MD5.encrypt(password));
+
+
+        ///////////////////查重name/////////////////////
         QueryWrapper<UserEntity> userQueryWrapper = new QueryWrapper<>();
         userQueryWrapper.eq("username", username);
         UserEntity u1 = this.getOne(userQueryWrapper);
@@ -82,19 +86,41 @@ public class UserServiceImpl extends ServiceImpl<UserDao, UserEntity> implements
             return "err";
 
         }
+        ////////////////////////////////////////
+        QueryWrapper<UserEntity> effect = new QueryWrapper<>();
+        Long ach;//因为数据库出毛病了所有只能自己随机id
+        do{
+             ach = Long.valueOf(RandomUtil.getSixBitRandom());
+            effect.eq("id",ach);
 
+        }while (this.getOne(effect)!=null);
+        //////////////////////////////////////////
+
+
+        user.setId(ach);
         user.setCreateTime(new Date());
         user.setStatus(0);
         System.out.println(user);
         this.save(user);
+        /////////////////////////////
         UserEntity userDetails = this.getOne(userQueryWrapper);
-        String jwtToken = JwtUtils.getJwtToken(userDetails.getId().toString(), userDetails.getUsername(),userDetails.getTeacherAccess());
+        String jwtToken = JwtUtils.getJwtToken(
+                userDetails.getId().toString(), userDetails.getUsername(),userDetails.getTeacherAccess()
+        );
         UserDTO userDTO = new UserDTO();
         BeanUtils.copyProperties(userDetails, userDTO);
         // 加入到redis中
         System.out.println(jwtToken);
         stringRedisTemplate.opsForValue().set(jwtToken, JSON.toJSONString(userDTO), 1, TimeUnit.DAYS);
         return jwtToken;
+
+    }
+
+    public void PraseAccess(UserEntity user) {
+            if(user.getTeacherAccess().equals("true")){System.out.println(1);}else{System.out.println(0);}
+            String access = user.getTeacherAccess().equals("false") ? "0":"1";
+            user.setTeacherAccess(access);
+
 
     }
 
@@ -158,7 +184,7 @@ public class UserServiceImpl extends ServiceImpl<UserDao, UserEntity> implements
     @Override
     public boolean delete(String id) {
         QueryWrapper<UserEntity> e1 = new QueryWrapper<>();
-        int n = DaoUser.delDATAbyid(id);
+        int n = DaoUser.delDATAbyid(Long.valueOf(id));
         e1.eq("id",id);
 //        Integer i1 = this.getBaseMapper().delete(e1);
         return n>0;
@@ -306,6 +332,8 @@ public class UserServiceImpl extends ServiceImpl<UserDao, UserEntity> implements
     public PageUtils NotePage(Map<String, Object> params) {
         QueryWrapper<CourseNoteEntity> e1 = new QueryWrapper<>();
         e1.eq("user_id",params.get("userId"));
+        if(params.containsKey("coursename"))e1.eq("coursename",params.get("coursename"));
+        if(params.containsKey("chapter"))e1.eq("chapter",params.get("chapter"));
         IPage<CourseNoteEntity> page = Note.page(
                 new Query<CourseNoteEntity>().getPage(params),
                 e1
@@ -345,17 +373,37 @@ public class UserServiceImpl extends ServiceImpl<UserDao, UserEntity> implements
     public PageUtils CoursePage(Map<String, Object> params) {
         QueryWrapper<CourseStudyEntity> e1 = new QueryWrapper<>();
         e1.eq("user_id",params.get("userId"));
+        if(params.containsKey("coursename"))e1.eq("coursename",params.get("coursename"));
+        if(params.containsKey("chapter"))e1.eq("chapter",params.get("chapter"));
         IPage<CourseStudyEntity> page = Course.page(
                 new Query<CourseStudyEntity>().getPage(params),
                 e1
         );
+        List<CourseStudyEntity> RAW = page.getRecords();
+        if(RAW.size()==0){
+            return new PageUtils(null,0,0,0);
+        }
+        List<Integer> Courseid = RAW.stream().map(CourseStudyEntity::getCourseId).collect(toList());
+        List<Long> Lessonid = RAW.stream().map(CourseStudyEntity::getLessonId).collect(toList());
+        System.out.println(Courseid);
+
+        List<CourseEntity> e2 = CE.listByIds(Courseid);
+        QueryWrapper<CourseLessonEntity> LESSON = new QueryWrapper<>();
+        LESSON.in("id", Lessonid);
+        LESSON.in("course_id", Courseid);
+        List<CourseLessonEntity> e3 = CEL.list(LESSON);
+        List<UserCourseEntity> RESULT = new ArrayList<>();
+        for(int i =0;i<RAW.size();i++){
+
+            RESULT.add(i, UserCourseEntity.make(RAW.get(i),e2.get(i),e3.get(i)));
+        }
         page.setTotal(page.getRecords().size());
         page.setPages(page.getTotal()/page.getSize()+1);
         System.out.println(page.getTotal());
         System.out.println(page.getSize());
         System.out.println(page.getCurrent());
         System.out.println(page.getPages());
-        return new PageUtils(page);
+        return new PageUtils(RESULT,(int)page.getTotal(),(int)page.getSize(),(int)page.getCurrent());
     }
 
     @Override
