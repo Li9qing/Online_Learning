@@ -27,6 +27,10 @@ import java.util.Map;
 public interface UserService extends IService<UserEntity> {
 
     PageUtils queryPage(Map<String, Object> params);
+    boolean delNote(String courseId,String lessonId,String userId);
+    PageUtils NotePage(Map<String, Object> params);
+    PageUtils CoursePage(Map<String, Object> params);
+    PageUtils SubmitPage(Map<String, Object> params);
     String login(UserEntity admin);
     String register(UserEntity user);
 
@@ -50,7 +54,7 @@ public interface UserService extends IService<UserEntity> {
     List<MessageAttrEntity> getSendList();
     List<MessageAttrEntity> getReciveList();
 
-    List<UserEntity> findUserInfo(String username);
+    UserEntity findUserInfo(String username);
 
     boolean delete(String id);
 }

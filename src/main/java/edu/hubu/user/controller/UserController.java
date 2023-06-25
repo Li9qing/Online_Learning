@@ -166,7 +166,7 @@ public class UserController {
         System.out.println("get update USER :"+user);
         if(user == null||user.getId()==null)return EMPTYdata();
 		boolean var =userService.updateById(user);
-        PageUtils page = userService.queryPage(new HashMap<String,Object>());
+//        PageUtils page = userService.queryPage(new HashMap<String,Object>());
         return R.ok().put("resujlt", var);
     }
 
@@ -191,8 +191,13 @@ public class UserController {
 //        delete(ids);
         System.out.println("get a id to delete lol"+id);
         boolean var = userService.delete(id);
+        return BOOLresult(var);
+    }
+
+    private R BOOLresult(boolean var) {
         return R.ok().put("result", var);
     }
+
     public R ERRtoken(){
         return R.error(ERROR,"no token!");
 
@@ -215,6 +220,32 @@ public class UserController {
         u1.put("count",re.size());
         return u1;
     }
+    @GetMapping("/pageNote")
+    // @RequiresPermissions("exam:user:list")
+    public R pageNote(String currentPage,String totalPage,String token){
+        if(token == null){
+            return ERRtoken();
+        }
+        Map<String, Object> params = PATCHparamByuserId(currentPage, totalPage, token);
+        PageUtils page = userService.NotePage(params);
+        return R.ok().put("page", page);
+    }
+
+    private Map<String, Object> PATCHparamByuserId(String currentPage, String totalPage, String token) {
+        Map<String,Object> params = new HashMap<>();
+        params.put("page", currentPage);
+        params.put("limit", totalPage);
+        UserDTO d1 = userService.getUserInfo(token);
+        params.put("userId",d1.getId());
+        return params;
+    }
+    @GetMapping("/delNote")
+    public R delNote(String courseId, String lessonId, String userId){
+        System.out.println(courseId+"_"+lessonId+""+userId);
+        if(courseId==null||lessonId==null||userId==null) return EMPTYdata();
+
+        return BOOLresult(userService.delNote(courseId,lessonId,userId));
+    }
     @GetMapping("/Course")
     public R getCourse(String token){
         if(token == null){
@@ -229,6 +260,17 @@ public class UserController {
         u1.put("count",re.size());
         return u1;
     }
+    @GetMapping("/pageCourse")
+    // @RequiresPermissions("exam:user:list")
+    public R pageCourse(String currentPage,String totalPage,String token){
+        if(token == null){
+            return ERRtoken();
+        }
+        Map<String, Object> params = PATCHparamByuserId(currentPage, totalPage, token);
+        PageUtils page = userService.CoursePage(params);
+        return R.ok().put("page", page);
+    }
+
     @GetMapping("/Submit")
     public R getSubmit(String token){
         if(token == null){
@@ -242,6 +284,16 @@ public class UserController {
         u1.put("Result",re);
         u1.put("count",re.size());
         return u1;
+    }
+    @GetMapping("/pageSubmit")
+    // @RequiresPermissions("exam:user:list")
+    public R pageSubmit(String currentPage,String totalPage,String token){
+        if(token == null){
+            return ERRtoken();
+        }
+        Map<String, Object> params = PATCHparamByuserId(currentPage, totalPage, token);
+        PageUtils page = userService.SubmitPage(params);
+        return R.ok().put("page", page);
     }
 
 }
