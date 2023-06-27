@@ -35,22 +35,42 @@ public class FileUploadController {
     public R ttt(){
         return R.error(2000,"try me");
     }
+
+
     @RequestMapping("/upload")
     public R uploadFile(@RequestBody MultipartFile file,@RequestParam("token")String token) {
         // 根据业务逻辑处理文件上传和保存
         if(file == null)return R.error(404,"no img");
-        UserEntity user = SERuser.getUserDetail(token);
 
-        System.out.println("get update USER :"+user);
+        UserEntity user = SERuser.getUserDetail(token);
+        if(user == null)return R.error(404,"NO USER!");
+
         UserEntity usr = SERuser.findUserInfo(user.getUsername());
         if(usr == null||usr.getId()==null)return R.error(404,"NO USER!");
 
 
+        return PraseFileToUser(file, usr);
+    }
+    @RequestMapping("/save")
+    public R save(@RequestBody MultipartFile file,@RequestParam("id")String id) {
+        // 根据业务逻辑处理文件上传和保存
+        if(file == null)return R.error(404,"no img");
+
+
+        UserEntity usr = SERuser.getById(id);
+        System.out.println(usr);
+        if(usr == null||usr.getId()==null)return R.error(404,"NO USER!");
+
+
+        return PraseFileToUser(file, usr);
+    }
+
+    private R PraseFileToUser(MultipartFile file, UserEntity usr) {
         R r1 ;
         if (!file.isEmpty()) {
             try {
                 // 获取文件名
-                String fileName =usr.getId()+  file.getOriginalFilename();
+                String fileName = usr.getId()+  file.getOriginalFilename();
 
                 // 生成文件保存路径，例如在本地存储
                 String filePath = DIR + fileName;
@@ -70,13 +90,14 @@ public class FileUploadController {
         } else {
             r1 =  R.error(404,"文件为空");
         }
-        if(!SERuser.updateById(usr)) return R.error(500,"SQL EXEC FAIL!");
-            return  r1;
+        if(!SERuser.updateById(usr)) r1 =  R.error(500,"SQL EXEC FAIL!");
+        return  r1;
     }
-    @GetMapping("/images/{id}")
-    public R displayImage(@PathVariable String id,String file) {
+
+    @GetMapping("/iconPerson/{id}")
+    public R displayImage(@PathVariable String id,String avatar) {
         // 根据ID从数据库或其他持久化存储中获取文件地址
-        String filePath = DIR + id + file;
+        String filePath = DIR + id + avatar;
 
         try {
             // 创建文件资源对象

@@ -18,6 +18,8 @@ public class UserCourseEntity {
         n1.setCoursename(e2.getName());
         n1.setUserId(e1.getUserId());
         n1.setLessonId(e1.getLessonId());
+        n1.setLessontitle(e3.getTitle());
+        n1.setLessontype(e3.getType());
         n1.setChapter(e3.getChapter());
         n1.setProgress(e1.getProgress());
         n1.setFinish(e1.getFinish());
@@ -35,6 +37,8 @@ public class UserCourseEntity {
      *
      */
     private String chapter;
+    private String lessontitle;
+    private Integer lessontype;
     private Long lessonId;
     /**
      * 学习进度

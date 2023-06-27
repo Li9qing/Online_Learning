@@ -1,9 +1,8 @@
 package edu.hubu.user.controller;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.io.File;
+import java.io.IOException;
+import java.util.*;
 
 // import org.apache.shiro.authz.annotation.RequiresPermissions;
 import edu.hubu.common.utils.R;
@@ -23,8 +22,12 @@ import org.springframework.web.bind.annotation.*;
 import edu.hubu.user.entity.UserEntity;
 import edu.hubu.user.service.UserService;
 import edu.hubu.common.utils.PageUtils;
+import org.springframework.web.multipart.MultipartFile;
 
+import static edu.hubu.user.utils.Result.*;
 import static edu.hubu.user.utils.ResultCode.ERROR;
+import static edu.hubu.user.utils.WrapperUtils.PraseAccess;
+import static edu.hubu.user.utils.WrapperUtils.PraseGenderOnly;
 
 
 /**
@@ -41,23 +44,24 @@ public class UserController {
     @Autowired
     private UserService userService;
 
+    private final String DIR = "C:\\Users\\K\\Videos\\summer_camp\\SELF\\images";
     /**
      * 列表
      */
     @ApiOperation("登陆")
     @PostMapping("/login")
-    public R login(@RequestBody UserEntity admin) {
-        System.out.println("get Post");
-        System.out.println(admin.toString());
-        String token = userService.login(admin);
+    public R login(@RequestBody UserEntity user) {
+        System.out.println(user.toString());
+        String token = userService.login(user);
         if(token.equals("err")){
-            return R.error(ERROR,"no such user!");
+            return R.error(ERROR,"no such user or consider BAN");
         }
         return R.ok().put("token", token);
     }
     @ApiOperation("注册")
     @PostMapping("/register")
     public R register(@RequestBody UserEntity user) {
+        if(user == null) return EMPTYdata();
         System.out.println(user);
         PraseAccess(user);
         String re = userService.register(user);
@@ -75,18 +79,28 @@ public class UserController {
         return R.ok().put("user", user);
     }
 
-    @GetMapping("find")
-    public R find(String username,String gender) {
+    @GetMapping("findStudent")
+    public R findStudent(String username,String gender) {
         if(username == null && gender == null){return  EMPTYdata();}
         Map<String,Object> m1 = new HashMap<>();
         System.out.println(username + "__" + gender);
-        m1.put("username",username);
-        m1.put("gender",gender);
-        m1.put("type",1);
+        if(username.length()>0)m1.put("username",username);
+        m1.put("gender",PraseGenderOnly(gender));
+        m1.put("teacher_access",0);
         PageUtils page = userService.queryPage(m1);
         return R.ok().put("page", page);
     }
-
+    @GetMapping("findTeacher")
+    public R findTeacher(String username,String gender) {
+        if(username == null && gender == null){return  EMPTYdata();}
+        Map<String,Object> m1 = new HashMap<>();
+        System.out.println(username + "__" + gender);
+        if(username.length()>0)m1.put("username",username);
+        m1.put("gender",PraseGenderOnly(gender));
+        m1.put("teacher_access",1);
+        PageUtils page = userService.queryPage(m1);
+        return R.ok().put("page", page);
+    }
     @GetMapping("detailPerson")
     public R detail(String token){
         if (token == null) return ERRtoken();
@@ -154,10 +168,16 @@ public class UserController {
     @RequestMapping("/save")
     // @RequiresPermissions("exam:user:save")
     public R save(@RequestBody UserEntity user){
-		userService.save(user);
+
+		if(userService.register(user).equals("err")) {
+            return DUPlicate();
+        }
 
         return R.ok();
     }
+
+
+
 
     /**
      * 修改
@@ -172,58 +192,45 @@ public class UserController {
         System.out.println(user);
 		boolean var =userService.updateById(user);
 //        PageUtils page = userService.queryPage(new HashMap<String,Object>());
-        return R.ok().put("resujlt", var);
+        return BOOLresult(var);
     }
 
-    private void PraseAccess(UserEntity user) {
-        if(user.getTeacherAccess().contains("true")||user.getTeacherAccess().contains("false")){
-            if(user.getTeacherAccess().equals("true")){
-                user.setTeacherAccess("1");
-            }else{
-                user.setTeacherAccess("0");
-            }
-        }
-    }
+//    private void PraseAccess(UserEntity user) {
+//        if(user.getTeacherAccess().contains("true")||user.getTeacherAccess().contains("false")){
+//            if(user.getTeacherAccess().equals("true")){
+//                user.setTeacherAccess("1");
+//            }else{
+//                user.setTeacherAccess("0");
+//            }
+//        }
+//    }
 
     @RequestMapping("/ban")
     // @RequiresPermissions("exam:user:delete")
     public R delete(@RequestBody String id){
         if(id == null)return EMPTYdata();
-		userService.removeById(id);
 
-        return R.ok();
+        return BOOLresult(userService.removeById(id));
     }
     @RequestMapping("/BatchDel")
     public R BatchDel(@RequestBody Long [] ids){
         if(ids.length==0)return EMPTYdata();
         boolean var =userService.removeByIds(Arrays.asList(ids));
-        return R.ok().put("Result",var);
+        return BOOLresult(var);
     }
     @Login
     @GetMapping("/del")
     // @RequiresPermissions("exam:user:delete")
     public R del(String id){
         if(id ==null) return EMPTYdata();
-//        Long[] ids = {Long.parseLong(id)};
-//        delete(ids);
         System.out.println("get a id to delete lol"+id);
         System.out.println(Long.valueOf(id));
+
+
         boolean var = userService.delete(id);
         return BOOLresult(var);
     }
 
-    private R BOOLresult(boolean var) {
-        return R.ok().put("result", var);
-    }
-
-    public R ERRtoken(){
-        return R.error(ERROR,"no token!");
-
-    }
-    public R EMPTYdata(){
-
-        return R.error(404,"no data!").put("count",0);
-    }
     @GetMapping("/note")
     public R getNote(String token){
         if(token == null){
@@ -233,10 +240,7 @@ public class UserController {
         if(re ==null){
             return EMPTYdata();
         }
-        R u1 = R.ok();
-        u1.put("Result",re);
-        u1.put("count",re.size());
-        return u1;
+        return PatchListResult(re);
     }
     @GetMapping("/pageNote")
     // @RequiresPermissions("exam:user:list")
@@ -294,10 +298,14 @@ public class UserController {
         if(re ==null){
             return EMPTYdata();
         }
-        R u1 = R.ok();
-        u1.put("Result",re);
-        u1.put("count",re.size());
-        return u1;
+        return PatchListResult(re);
+    }
+    @GetMapping("/delCourse")
+    public R delCourse(String courseId, String lessonId, String userId){
+        System.out.println(courseId+"_"+lessonId+""+userId);
+        if(courseId==null||lessonId==null||userId==null) return EMPTYdata();
+
+        return BOOLresult(userService.delCourse(courseId,lessonId,userId));
     }
     @GetMapping("/pageCourse")
     // @RequiresPermissions("exam:user:list")
@@ -311,6 +319,20 @@ public class UserController {
         PageUtils page = userService.CoursePage(params);
         return R.ok().put("page", page);
     }
+    @GetMapping("/pageCoursIng")
+    // @RequiresPermissions("exam:user:list")
+    public R pageCoursIng(String currentPage,String totalPage,String token){
+        if(token == null){
+            return ERRtoken();
+        }
+        UserDTO d1 = userService.getUserInfo(token);
+        if(d1==null)return ERRtoken();
+        Map<String, Object> params = PATCHparamByuserId(currentPage, totalPage, d1.getId());
+        params.put("finish",0);
+        params.put("finish_time",new Date());
+        PageUtils page = userService.CoursePage(params);
+        return R.ok().put("page", page);
+    }
 
     @GetMapping("/Submit")
     public R getSubmit(String token){
@@ -321,10 +343,7 @@ public class UserController {
         if(re ==null){
             return EMPTYdata();
         }
-        R u1 = R.ok();
-        u1.put("Result",re);
-        u1.put("count",re.size());
-        return u1;
+        return PatchListResult(re);
     }
     @GetMapping("/pageSubmit")
     // @RequiresPermissions("exam:user:list")

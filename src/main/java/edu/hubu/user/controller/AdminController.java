@@ -7,6 +7,8 @@ import java.util.Map;
 import edu.hubu.user.entity.AdminDTO;
 import edu.hubu.user.entity.UserDTO;
 import edu.hubu.user.entity.UserEntity;
+import edu.hubu.user.interceptor.Login;
+import edu.hubu.user.service.UserService;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -16,6 +18,8 @@ import edu.hubu.user.service.AdminService;
 import edu.hubu.common.utils.PageUtils;
 import edu.hubu.common.utils.R;
 
+import static edu.hubu.user.utils.Result.BOOLresult;
+import static edu.hubu.user.utils.Result.EMPTYdata;
 
 
 /**
@@ -31,7 +35,8 @@ import edu.hubu.common.utils.R;
 public class AdminController {
     @Autowired
     private AdminService adminService;
-
+    @Autowired
+    private UserService userService;
 
     @PostMapping("/login")
     public R login(@RequestBody AdminEntity admin) {
@@ -42,6 +47,34 @@ public class AdminController {
             return R.error(20001,"no such user!");
         }
         return R.ok().put("token", token);
+    }
+
+
+    @RequestMapping("/ban")
+    // @RequiresPermissions("exam:user:delete")
+    public R delete(@RequestBody String id){
+        if(id == null)return EMPTYdata();
+        userService.removeById(id);
+
+        return R.ok();
+    }
+    @RequestMapping("/BatchDel")
+    public R BatchDel(@RequestBody Long [] ids){
+        if(ids.length==0)return EMPTYdata();
+        boolean var =userService.removeByIds(Arrays.asList(ids));
+        return R.ok().put("Result",var);
+    }
+    @Login
+    @GetMapping("/del")
+    // @RequiresPermissions("exam:user:delete")
+    public R del(String id){
+        if(id ==null) return EMPTYdata();
+//        Long[] ids = {Long.parseLong(id)};
+//        delete(ids);
+        System.out.println("get a id to delete lol"+id);
+        System.out.println(Long.valueOf(id));
+        boolean var = userService.delete(id);
+        return BOOLresult(var);
     }
 //    @ApiOperation("注册")
 //    @PostMapping("/register")

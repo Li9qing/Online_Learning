@@ -25,10 +25,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -46,7 +43,6 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import javax.annotation.Resource;
 
 import static java.util.stream.Collectors.toList;
-
 
 @Service("userService")
 public class UserServiceImpl extends ServiceImpl<UserDao, UserEntity> implements UserService {
@@ -73,7 +69,6 @@ public class UserServiceImpl extends ServiceImpl<UserDao, UserEntity> implements
         String nick = user.getNickName();
         String username = user.getUsername();
         String password = user.getPassword();
-        PraseAccess(user);
         System.out.println(username + "____________" + password+"___________"+user.getTeacherAccess());
         System.out.println(MD5.encrypt(password));
 
@@ -116,13 +111,6 @@ public class UserServiceImpl extends ServiceImpl<UserDao, UserEntity> implements
 
     }
 
-    public void PraseAccess(UserEntity user) {
-            if(user.getTeacherAccess().equals("true")){System.out.println(1);}else{System.out.println(0);}
-            String access = user.getTeacherAccess().equals("false") ? "0":"1";
-            user.setTeacherAccess(access);
-
-
-    }
 
 
     @Override
@@ -136,13 +124,12 @@ public class UserServiceImpl extends ServiceImpl<UserDao, UserEntity> implements
         QueryWrapper<UserEntity> userQueryWrapper = new QueryWrapper<>();
         userQueryWrapper.eq("username", username);
         userQueryWrapper.eq("password", password);
-
         UserEntity userDetails = this.getOne(userQueryWrapper);
 
         //if (userDetails != null && !MD5.encrypt(password).equals(userDetails.getPassword()))
         //throw new EduException("用户名或密码错误!");
 
-        if (userDetails == null) {
+        if (userDetails == null||userDetails.getStatus()==1) {
 
             return "err";
         }
@@ -281,7 +268,7 @@ public class UserServiceImpl extends ServiceImpl<UserDao, UserEntity> implements
         if(params.size()>2){
 
             if(params.containsKey("username"))e1.eq("username",params.get("username"));
-            if(params.containsKey("username"))e1.eq("username",params.get("username"));
+            if(params.containsKey("gender"))e1.eq("gender",params.get("gender"));
         }
         IPage<UserEntity> page = this.page(
                 new Query<UserEntity>().getPage(params),
@@ -302,8 +289,8 @@ public class UserServiceImpl extends ServiceImpl<UserDao, UserEntity> implements
         q1.eq("user_id",userId);
         q1.eq("course_id",courseId);
         q1.eq("lesson_id",lessonId);
-        Note.remove(q1);
-        return false;
+
+        return Note.remove(q1);
     }
 
     @Override
@@ -346,18 +333,35 @@ public class UserServiceImpl extends ServiceImpl<UserDao, UserEntity> implements
         List<Long> Lessonid = RAW.stream().map(CourseNoteEntity::getLessonId).collect(toList());
         System.out.println(Courseid);
 
+
+
         List<CourseEntity> e2 = CE.listByIds(Courseid);
+        Map<Long, CourseEntity> courseMap = new HashMap<>();
+        for (CourseEntity course : e2) {
+            courseMap.put(course.getId(), course);
+        }
+
+
+
         QueryWrapper<CourseLessonEntity> LESSON = new QueryWrapper<>();
         LESSON.in("id", Lessonid);
         LESSON.in("course_id", Courseid);
         List<CourseLessonEntity> e3 = CEL.list(LESSON);
 
-        List<UserNoteEntity> RESULT = new ArrayList<>();
-        for(int i =0;i<RAW.size();i++){
 
-            RESULT.add(i, UserNoteEntity.make(RAW.get(i),e2.get(i),e3.get(i)));
+        Map<Long, CourseLessonEntity> LessonMap = new HashMap<>();
+        for (CourseLessonEntity lesson : e3) {
+            LessonMap.put(lesson.getCourseId(), lesson);
         }
 
+
+        List<UserNoteEntity> RESULT = new ArrayList<>();
+        for(int i =0;i<RAW.size();i++){
+            CourseNoteEntity index = (RAW.get(i));
+            Long courseId = index.getCourseId();
+            System.out.println(courseId);
+            RESULT.add(i, UserNoteEntity.make(index,courseMap.get(courseId),LessonMap.get(courseId)));
+        }
         page.setTotal(page.getRecords().size());
         page.setPages(page.getTotal()/page.getSize()+1);
 
@@ -370,11 +374,22 @@ public class UserServiceImpl extends ServiceImpl<UserDao, UserEntity> implements
     }
 
     @Override
+    public boolean delCourse(String courseId, String lessonId, String userId) {
+        QueryWrapper<CourseStudyEntity> q1 = new QueryWrapper<>();
+        q1.eq("user_id",userId);
+        q1.eq("course_id",courseId);
+        q1.eq("lesson_id",lessonId);
+
+        return Course.remove(q1);
+    }
+
+    @Override
     public PageUtils CoursePage(Map<String, Object> params) {
         QueryWrapper<CourseStudyEntity> e1 = new QueryWrapper<>();
         e1.eq("user_id",params.get("userId"));
         if(params.containsKey("coursename"))e1.eq("coursename",params.get("coursename"));
         if(params.containsKey("chapter"))e1.eq("chapter",params.get("chapter"));
+        if(params.containsKey("finish"))e1.eq("finish",params.get("finish"));
         IPage<CourseStudyEntity> page = Course.page(
                 new Query<CourseStudyEntity>().getPage(params),
                 e1
@@ -387,15 +402,33 @@ public class UserServiceImpl extends ServiceImpl<UserDao, UserEntity> implements
         List<Long> Lessonid = RAW.stream().map(CourseStudyEntity::getLessonId).collect(toList());
         System.out.println(Courseid);
 
+
         List<CourseEntity> e2 = CE.listByIds(Courseid);
+        Map<Long, CourseEntity> courseMap = new HashMap<>();
+        for (CourseEntity course : e2) {
+            courseMap.put(course.getId(), course);
+        }
+
+
+
         QueryWrapper<CourseLessonEntity> LESSON = new QueryWrapper<>();
         LESSON.in("id", Lessonid);
         LESSON.in("course_id", Courseid);
         List<CourseLessonEntity> e3 = CEL.list(LESSON);
+
+
+        Map<Long, CourseLessonEntity> LessonMap = new HashMap<>();
+        for (CourseLessonEntity lesson : e3) {
+            LessonMap.put(lesson.getCourseId(), lesson);
+        }
+
+
         List<UserCourseEntity> RESULT = new ArrayList<>();
         for(int i =0;i<RAW.size();i++){
-
-            RESULT.add(i, UserCourseEntity.make(RAW.get(i),e2.get(i),e3.get(i)));
+            CourseStudyEntity index = (RAW.get(i));
+            Long courseId = index.getCourseId().longValue();
+            System.out.println(courseId);
+            RESULT.add(i, UserCourseEntity.make(index,courseMap.get(courseId),LessonMap.get(courseId)));
         }
         page.setTotal(page.getRecords().size());
         page.setPages(page.getTotal()/page.getSize()+1);

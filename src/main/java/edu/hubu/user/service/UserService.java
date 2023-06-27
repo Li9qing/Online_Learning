@@ -33,6 +33,7 @@ public interface UserService extends IService<UserEntity> {
     PageUtils queryPage(Map<String, Object> params);
     boolean delNote(String courseId,String lessonId,String userId);
     PageUtils NotePage(Map<String, Object> params);
+    boolean delCourse(String courseId, String lessonId, String userId);
     PageUtils CoursePage(Map<String, Object> params);
     PageUtils SubmitPage(Map<String, Object> params);
     String login(UserEntity admin);
@@ -63,5 +64,7 @@ public interface UserService extends IService<UserEntity> {
     boolean delete(String id);
 
     boolean updateNote(UserNoteEntity note);
+
+
 }
 

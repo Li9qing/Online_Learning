@@ -24,7 +24,40 @@ public class WrapperUtils {
         wrapper.eq("user_id", id);
         return wrapper;
     }
+    public static void PraseAccess(UserEntity user) {
+        String lang = "true,false";
+        if(lang.contains(user.getTeacherAccess())){
+            if(user.getTeacherAccess().equals("true")){
+                user.setTeacherAccess("1");
+            }else{
+                user.setTeacherAccess("0");
+            }
+        }
+    }
+    public static void PraseGender(UserEntity user) {
+        String MALE = "男,male,1";
+        String FEMALE = "女,female,0";
+            if(MALE.contains(user.getGender().toString())){
+                user.setTeacherAccess("1");
+            }else if(FEMALE.contains(user.getGender().toString())){
+                user.setTeacherAccess("0");
+            }else{
+                user.setTeacherAccess("3");//中性人
+            }
 
+    }
+    public static Integer PraseGenderOnly(String gender) {
+        String MALE = "男,male,1";
+        String FEMALE = "女,female,0";
+        if(MALE.contains(gender)){
+            return 1;
+        }else if(FEMALE.contains(gender)){
+            return 0;
+        }else{
+            return 3;//中性人
+        }
+
+    }
 
 //    public static <T> IPage<T> getPage(Class<T> clazz, Map<String, Object> params){
 //        QueryWrapper<T> e1 = new QueryWrapper<>();
