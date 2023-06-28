@@ -73,6 +73,8 @@ public class UserServiceImpl extends ServiceImpl<UserDao, UserEntity> implements
         System.out.println(MD5.encrypt(password));
 
 
+        //user.setPassword(MD5.encrypt(password));
+
         ///////////////////查重name/////////////////////
         QueryWrapper<UserEntity> userQueryWrapper = new QueryWrapper<>();
         userQueryWrapper.eq("username", username);
@@ -81,30 +83,28 @@ public class UserServiceImpl extends ServiceImpl<UserDao, UserEntity> implements
             return "err";
 
         }
-        ////////////////////////////////////////
+        //////////////////////因为数据库出毛病了所有只能自己随机id//////////////////
         QueryWrapper<UserEntity> effect = new QueryWrapper<>();
-        Long ach;//因为数据库出毛病了所有只能自己随机id
+        Long ach;//
         do{
              ach = Long.valueOf(RandomUtil.getSixBitRandom());
             effect.eq("id",ach);
 
         }while (this.getOne(effect)!=null);
-        //////////////////////////////////////////
-
-
+        ////////////////保存//////////////////////////
         user.setId(ach);
         user.setCreateTime(new Date());
         user.setStatus(0);
         System.out.println(user);
         this.save(user);
-        /////////////////////////////
+        //////////////加入到redis中///////////////
         UserEntity userDetails = this.getOne(userQueryWrapper);
         String jwtToken = JwtUtils.getJwtToken(
                 userDetails.getId().toString(), userDetails.getUsername(),userDetails.getTeacherAccess()
         );
         UserDTO userDTO = new UserDTO();
         BeanUtils.copyProperties(userDetails, userDTO);
-        // 加入到redis中
+        ////////////////返回token///////////////////////
         System.out.println(jwtToken);
         stringRedisTemplate.opsForValue().set(jwtToken, JSON.toJSONString(userDTO), 1, TimeUnit.DAYS);
         return jwtToken;
@@ -147,15 +147,16 @@ public class UserServiceImpl extends ServiceImpl<UserDao, UserEntity> implements
 
     @Override
     public UserDTO getUserInfo(String token) {
+
         String userJson = stringRedisTemplate.opsForValue().get(token);
         UserDTO e1 = JSON.parseObject(userJson, UserDTO.class);
         if(e1 == null){return  null;}
+
         QueryWrapper<UserEntity> x2 = new QueryWrapper<>();
         x2.eq("username",e1.getUsername());
         UserEntity e2 =this.getOne(x2);
         e1.setId(e2.getId().toString());
         System.out.println(e1);
-
         return e1;
     }
 
@@ -164,16 +165,16 @@ public class UserServiceImpl extends ServiceImpl<UserDao, UserEntity> implements
         QueryWrapper<UserEntity> x2 = new QueryWrapper<>();
         x2.eq("username",username);
         UserEntity e2 =this.getOne(x2);
-
         return e2;
     }
 
     @Override
     public boolean delete(String id) {
-        QueryWrapper<UserEntity> e1 = new QueryWrapper<>();
-        int n = DaoUser.delDATAbyid(Long.valueOf(id));
-        e1.eq("id",id);
+//        QueryWrapper<UserEntity> e1 = new QueryWrapper<>();
+//        e1.eq("id",id);
 //        Integer i1 = this.getBaseMapper().delete(e1);
+        int n = DaoUser.delDATAbyid(Long.valueOf(id));
+
         return n>0;
     }
 
@@ -261,6 +262,8 @@ public class UserServiceImpl extends ServiceImpl<UserDao, UserEntity> implements
         return null;
     }
 
+
+
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
         QueryWrapper<UserEntity> e1 = new QueryWrapper<>();
@@ -317,10 +320,15 @@ public class UserServiceImpl extends ServiceImpl<UserDao, UserEntity> implements
 
     @Override
     public PageUtils NotePage(Map<String, Object> params) {
+
+
         QueryWrapper<CourseNoteEntity> e1 = new QueryWrapper<>();
         e1.eq("user_id",params.get("userId"));
         if(params.containsKey("coursename"))e1.eq("coursename",params.get("coursename"));
         if(params.containsKey("chapter"))e1.eq("chapter",params.get("chapter"));
+
+
+
         IPage<CourseNoteEntity> page = Note.page(
                 new Query<CourseNoteEntity>().getPage(params),
                 e1
@@ -334,7 +342,7 @@ public class UserServiceImpl extends ServiceImpl<UserDao, UserEntity> implements
         System.out.println(Courseid);
 
 
-
+////////////////////////////获取课程及其章节信息/////////////////////////////////////////////
         List<CourseEntity> e2 = CE.listByIds(Courseid);
         Map<Long, CourseEntity> courseMap = new HashMap<>();
         for (CourseEntity course : e2) {
@@ -353,8 +361,8 @@ public class UserServiceImpl extends ServiceImpl<UserDao, UserEntity> implements
         for (CourseLessonEntity lesson : e3) {
             LessonMap.put(lesson.getCourseId(), lesson);
         }
-
-
+///////////////////////////////////////////////////////////////////
+/////////////////////////////处理多对一的映射关系，并整理出前端所需的数据格式////////////////////////////////////
         List<UserNoteEntity> RESULT = new ArrayList<>();
         for(int i =0;i<RAW.size();i++){
             CourseNoteEntity index = (RAW.get(i));
@@ -364,7 +372,7 @@ public class UserServiceImpl extends ServiceImpl<UserDao, UserEntity> implements
         }
         page.setTotal(page.getRecords().size());
         page.setPages(page.getTotal()/page.getSize()+1);
-
+////////////////////////////////////////////////////////////////
         System.out.println(page.getTotal());
         System.out.println(page.getSize());
         System.out.println(page.getCurrent());
@@ -375,12 +383,12 @@ public class UserServiceImpl extends ServiceImpl<UserDao, UserEntity> implements
 
     @Override
     public boolean delCourse(String courseId, String lessonId, String userId) {
-        QueryWrapper<CourseStudyEntity> q1 = new QueryWrapper<>();
-        q1.eq("user_id",userId);
-        q1.eq("course_id",courseId);
-        q1.eq("lesson_id",lessonId);
+        QueryWrapper<CourseStudyEntity> del = new QueryWrapper<>();
+        del.eq("user_id",userId);
+        del.eq("course_id",courseId);
+        del.eq("lesson_id",lessonId);
 
-        return Course.remove(q1);
+        return Course.remove(del);
     }
 
     @Override
@@ -401,8 +409,7 @@ public class UserServiceImpl extends ServiceImpl<UserDao, UserEntity> implements
         List<Integer> Courseid = RAW.stream().map(CourseStudyEntity::getCourseId).collect(toList());
         List<Long> Lessonid = RAW.stream().map(CourseStudyEntity::getLessonId).collect(toList());
         System.out.println(Courseid);
-
-
+////////////////////////////获取课程及其章节信息/////////////////////////////////////////////
         List<CourseEntity> e2 = CE.listByIds(Courseid);
         Map<Long, CourseEntity> courseMap = new HashMap<>();
         for (CourseEntity course : e2) {
@@ -421,8 +428,8 @@ public class UserServiceImpl extends ServiceImpl<UserDao, UserEntity> implements
         for (CourseLessonEntity lesson : e3) {
             LessonMap.put(lesson.getCourseId(), lesson);
         }
-
-
+////////////////////////////////////////////////////////////////////////////
+/////////////////////////////处理多对一的映射关系，并整理出前端所需的数据格式////////////////////////////////////
         List<UserCourseEntity> RESULT = new ArrayList<>();
         for(int i =0;i<RAW.size();i++){
             CourseStudyEntity index = (RAW.get(i));
@@ -430,6 +437,7 @@ public class UserServiceImpl extends ServiceImpl<UserDao, UserEntity> implements
             System.out.println(courseId);
             RESULT.add(i, UserCourseEntity.make(index,courseMap.get(courseId),LessonMap.get(courseId)));
         }
+////////////////////////////////////////////////////////////////
         page.setTotal(page.getRecords().size());
         page.setPages(page.getTotal()/page.getSize()+1);
         System.out.println(page.getTotal());

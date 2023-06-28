@@ -9,17 +9,16 @@ import edu.hubu.common.utils.R;
 import edu.hubu.course.entity.CourseNoteEntity;
 import edu.hubu.course.entity.CourseStudyEntity;
 import edu.hubu.exam.entity.SubmitEntity;
-import edu.hubu.user.entity.Result;
+import edu.hubu.user.entity.*;
 
-import edu.hubu.user.entity.UserDTO;
-import edu.hubu.user.entity.UserNoteEntity;
 import edu.hubu.user.interceptor.Login;
 import edu.hubu.user.interceptor.Register;
+import edu.hubu.user.service.impl.UserFavorServiceImpl;
+import edu.hubu.user.service.impl.UserFolderServiceImpl;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import edu.hubu.user.entity.UserEntity;
 import edu.hubu.user.service.UserService;
 import edu.hubu.common.utils.PageUtils;
 import org.springframework.web.multipart.MultipartFile;
@@ -43,7 +42,10 @@ import static edu.hubu.user.utils.WrapperUtils.PraseGenderOnly;
 public class UserController {
     @Autowired
     private UserService userService;
-
+    @Autowired
+    private UserFavorServiceImpl UFR;
+    @Autowired
+    private UserFolderServiceImpl UFD;
     private final String DIR = "C:\\Users\\K\\Videos\\summer_camp\\SELF\\images";
     /**
      * 列表
@@ -79,28 +81,7 @@ public class UserController {
         return R.ok().put("user", user);
     }
 
-    @GetMapping("findStudent")
-    public R findStudent(String username,String gender) {
-        if(username == null && gender == null){return  EMPTYdata();}
-        Map<String,Object> m1 = new HashMap<>();
-        System.out.println(username + "__" + gender);
-        if(username.length()>0)m1.put("username",username);
-        m1.put("gender",PraseGenderOnly(gender));
-        m1.put("teacher_access",0);
-        PageUtils page = userService.queryPage(m1);
-        return R.ok().put("page", page);
-    }
-    @GetMapping("findTeacher")
-    public R findTeacher(String username,String gender) {
-        if(username == null && gender == null){return  EMPTYdata();}
-        Map<String,Object> m1 = new HashMap<>();
-        System.out.println(username + "__" + gender);
-        if(username.length()>0)m1.put("username",username);
-        m1.put("gender",PraseGenderOnly(gender));
-        m1.put("teacher_access",1);
-        PageUtils page = userService.queryPage(m1);
-        return R.ok().put("page", page);
-    }
+
     @GetMapping("detailPerson")
     public R detail(String token){
         if (token == null) return ERRtoken();
@@ -108,80 +89,16 @@ public class UserController {
 
         return R.ok().put("user", user);
     }
-
-
-
     @ApiOperation("登出")
     @GetMapping("logout")
     public R logout(@RequestParam String token) {
         return R.error(50008," log out");
     }
 
-
-    @Login
-    @RequestMapping("/list")
-    // @RequiresPermissions("exam:user:list")
-    public R list(@RequestParam Map<String, Object> params){
-        PageUtils page = userService.queryPage(params);
-
-        return R.ok().put("page", page);
-    }
-
-
-    @GetMapping("/pageStudent")
-    // @RequiresPermissions("exam:user:list")
-    public R PagerStudent(String currentPage,String totalPage){
-        Map<String,Object> params = new HashMap<>();
-        params.put("page",currentPage);
-        params.put("limit",totalPage);
-        params.put("teacher_access",0);
-        PageUtils page = userService.queryPage(params);
-
-        return R.ok().put("page", page);
-    }
-    @GetMapping("/pageTeacher")
-    // @RequiresPermissions("exam:user:list")
-    public R PagerTeacher(String currentPage,String totalPage){
-        Map<String,Object> params = new HashMap<>();
-        params.put("page",currentPage);
-        params.put("limit",totalPage);
-        params.put("teacher_access",1);
-        PageUtils page = userService.queryPage(params);
-
-        return R.ok().put("page", page);
-    }
-
-    /**
-     * 信息
-     */
-    @RequestMapping("/info/{id}")
-    // @RequiresPermissions("exam:user:info")
-    public R info(@PathVariable("id") Long id){
-		UserEntity user = userService.getById(id);
-
-        return R.ok().put("user", user);
-    }
-
-    /**
-     * 保存
-     */
-    @RequestMapping("/save")
-    // @RequiresPermissions("exam:user:save")
-    public R save(@RequestBody UserEntity user){
-
-		if(userService.register(user).equals("err")) {
-            return DUPlicate();
-        }
-
-        return R.ok();
-    }
-
-
-
-
-    /**
-     * 修改
-     */
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////个人中心//////////////////////////////////////////////////////////////
+//////////////////////////////信息设置//////////////////////////////////////////////////
+    @ApiOperation("保存修改个人信息")
     @PostMapping("/update")
     // @RequiresPermissions("exam:user:update")
     public R update(@RequestBody UserEntity user){
@@ -190,47 +107,38 @@ public class UserController {
 
         PraseAccess(user);
         System.out.println(user);
-		boolean var =userService.updateById(user);
-//        PageUtils page = userService.queryPage(new HashMap<String,Object>());
+        boolean var =userService.updateById(user);
+    //        PageUtils page = userService.queryPage(new HashMap<String,Object>());
         return BOOLresult(var);
     }
 
-//    private void PraseAccess(UserEntity user) {
-//        if(user.getTeacherAccess().contains("true")||user.getTeacherAccess().contains("false")){
-//            if(user.getTeacherAccess().equals("true")){
-//                user.setTeacherAccess("1");
-//            }else{
-//                user.setTeacherAccess("0");
-//            }
-//        }
-//    }
+//////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////收藏管理//////////////////////////////////////////
 
-    @RequestMapping("/ban")
-    // @RequiresPermissions("exam:user:delete")
-    public R delete(@RequestBody String id){
-        if(id == null)return EMPTYdata();
+    @GetMapping("/foldFavor")
+    public R FoldFavor(String userId){
 
-        return BOOLresult(userService.removeById(id));
-    }
-    @RequestMapping("/BatchDel")
-    public R BatchDel(@RequestBody Long [] ids){
-        if(ids.length==0)return EMPTYdata();
-        boolean var =userService.removeByIds(Arrays.asList(ids));
-        return BOOLresult(var);
-    }
-    @Login
-    @GetMapping("/del")
-    // @RequiresPermissions("exam:user:delete")
-    public R del(String id){
-        if(id ==null) return EMPTYdata();
-        System.out.println("get a id to delete lol"+id);
-        System.out.println(Long.valueOf(id));
+        if(userService.getBaseMapper().selectById(userId)==null) return EMPTYdata();
+        List<UserFolder>fold =UFD.getFolders(userId);
+        List<UserFavor>favor =  UFR.getFavors(userId);
+        R n1 =  R.ok();
+        n1.put("fold",fold);
+        n1.put("favor",favor);
+        return n1;
 
-
-        boolean var = userService.delete(id);
-        return BOOLresult(var);
     }
 
+
+
+
+
+
+
+
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////笔记管理///////////////////////////////////////////////////////////////////////////////////////////
+    @ApiOperation("首页信息展示")
     @GetMapping("/note")
     public R getNote(String token){
         if(token == null){
@@ -288,7 +196,9 @@ public class UserController {
 //
 //        return R.ok().put("page", page);
 //    }
-
+//////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////课程管理历史管理/////////////////////////////////////////////////////////
+    @ApiOperation("首页课程展示")
     @GetMapping("/Course")
     public R getCourse(String token){
         if(token == null){
@@ -333,7 +243,9 @@ public class UserController {
         PageUtils page = userService.CoursePage(params);
         return R.ok().put("page", page);
     }
-
+//////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////
+    @ApiOperation("首页测评展示")
     @GetMapping("/Submit")
     public R getSubmit(String token){
         if(token == null){
