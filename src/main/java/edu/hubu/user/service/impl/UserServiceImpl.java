@@ -183,6 +183,7 @@ public class UserServiceImpl extends ServiceImpl<UserDao, UserEntity> implements
     public UserEntity getUserDetail(String token) {
         String userJson = stringRedisTemplate.opsForValue().get(token);
         UserDTO index = JSON.parseObject(userJson, UserDTO.class);
+        if(index == null)return null;
         QueryWrapper<UserEntity> Re = new QueryWrapper<>();
         Re.eq("username",index.getUsername());
 
@@ -268,11 +269,8 @@ public class UserServiceImpl extends ServiceImpl<UserDao, UserEntity> implements
     public PageUtils queryPage(Map<String, Object> params) {
         QueryWrapper<UserEntity> e1 = new QueryWrapper<>();
         e1.eq("teacher_access",params.get("teacher_access"));
-        if(params.size()>2){
-
-            if(params.containsKey("username"))e1.eq("username",params.get("username"));
-            if(params.containsKey("gender"))e1.eq("gender",params.get("gender"));
-        }
+        if(params.containsKey("username"))e1.eq("username",params.get("username"));
+        if(params.containsKey("gender"))e1.eq("gender",params.get("gender"));
         IPage<UserEntity> page = this.page(
                 new Query<UserEntity>().getPage(params),
                 e1
@@ -424,9 +422,9 @@ public class UserServiceImpl extends ServiceImpl<UserDao, UserEntity> implements
         List<CourseLessonEntity> e3 = CEL.list(LESSON);
 
 
-        Map<Long, CourseLessonEntity> LessonMap = new HashMap<>();
+        Map<String, CourseLessonEntity> LessonMap = new HashMap<>();
         for (CourseLessonEntity lesson : e3) {
-            LessonMap.put(lesson.getCourseId(), lesson);
+            LessonMap.put(lesson.getCourseId()+"_"+ lesson.getId(), lesson);
         }
 ////////////////////////////////////////////////////////////////////////////
 /////////////////////////////处理多对一的映射关系，并整理出前端所需的数据格式////////////////////////////////////
@@ -434,8 +432,9 @@ public class UserServiceImpl extends ServiceImpl<UserDao, UserEntity> implements
         for(int i =0;i<RAW.size();i++){
             CourseStudyEntity index = (RAW.get(i));
             Long courseId = index.getCourseId().longValue();
+            Long lessonId = index.getLessonId();
             System.out.println(courseId);
-            RESULT.add(i, UserCourseEntity.make(index,courseMap.get(courseId),LessonMap.get(courseId)));
+            RESULT.add(i, UserCourseEntity.make(index,courseMap.get(courseId),LessonMap.get(courseId+"_"+lessonId)));
         }
 ////////////////////////////////////////////////////////////////
         page.setTotal(page.getRecords().size());

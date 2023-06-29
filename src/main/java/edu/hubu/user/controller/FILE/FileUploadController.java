@@ -23,8 +23,29 @@ import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Objects;
-@RequestMapping("user/center")
+import java.util.UUID;
+
+import org.springframework.util.ResourceUtils;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.UUID;
+import com.qiniu.storage.Configuration;
+import com.qiniu.storage.Region;
+import com.qiniu.storage.UploadManager;
+import com.qiniu.util.Auth;
+
+@RequestMapping("/user/center")
 @CrossOrigin
 @RestController
 public class FileUploadController {
@@ -68,25 +89,22 @@ public class FileUploadController {
     private R PraseFileToUser(MultipartFile file, UserEntity usr) {
         R r1 ;
         if (!file.isEmpty()) {
-            try {
-                // 获取文件名
-                String fileName = usr.getId()+  file.getOriginalFilename();
+            //                // 获取文件名
+//                String fileName = usr.getId()+  file.getOriginalFilename();
+//
+//                // 生成文件保存路径，例如在本地存储
+//                String filePath = DIR + fileName;
+//
+//                // 将文件保存到指定路径
+//                File dest = new File(filePath);
+//                file.transferTo(dest);
 
-                // 生成文件保存路径，例如在本地存储
-                String filePath = DIR + fileName;
-
-                // 将文件保存到指定路径
-                File dest = new File(filePath);
-                file.transferTo(dest);
-
-                // 将文件地址与ID关联保存到数据库或其他持久化存储中
-                // 这里只是示例，可以根据具体业务需求进行调整
-                usr.setAvatar(fileName);
-                r1 =  R.ok("文件上传成功");
-            } catch (IOException e) {
-                e.printStackTrace();
-                r1 =  R.error(500,("文件上传失败"));
-            }
+            // 将文件地址与ID关联保存到数据库或其他持久化存储中
+            // 这里只是示例，可以根据具体业务需求进行调整
+            String result  = ImageUpload(file);
+            if(result.equals("err"))return R.error(500,"CLOUDS ERR");
+            usr.setAvatar(result);
+            r1 =  R.ok("文件上传成功");
         } else {
             r1 =  R.error(404,"文件为空");
         }
@@ -119,5 +137,43 @@ public class FileUploadController {
         // 文件不存在或无法访问时返回404错误
         return R.error(404,"not found");
     }
+    private static String accessKey = "1dmaZ6-0lye5dyEndk0_f-f1_16diJZbSBlbaTiL";      //公钥
+    private static String accessSecretKey = "-7zVdUSDSKURybNeAjRwPIm1nIyOjecusnu0EkfT";   //私钥
+    private static String bucket = "20230625";   // 存储空间
+    private static String url = "http://rwsybr8qt.hn-bkt.clouddn.com";
 
+    @PostMapping("/uploadImage")
+    public String ImageUpload(@RequestParam("avatar") MultipartFile imgFile)  {
+
+        try {
+            //1、获取文件上传的流
+            byte[] fileBytes = imgFile.getBytes();
+            //2、创建日期目录分隔
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd");
+            String datePath = dateFormat.format(new Date());
+
+            //3、获取文件名
+            String originalFilename = imgFile.getOriginalFilename();
+            String suffix = originalFilename.substring(originalFilename.lastIndexOf("."));
+
+            String filename = datePath+"/"+ UUID.randomUUID().toString().replace("-", "")+ suffix;
+
+            //4.构造一个带指定 Region 对象的配置类
+            //Region.南(根据自己的对象空间的地址选
+            Configuration cfg = new Configuration(Region.huanan());
+            UploadManager uploadManager = new UploadManager(cfg);
+
+            //5.获取七牛云提供的 token
+            Auth auth = Auth.create(accessKey, accessSecretKey);
+            String upToken = auth.uploadToken(bucket);
+
+            uploadManager.put(fileBytes, filename, upToken);
+
+            return url+ "/" + filename;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return "err";
+    }
 }

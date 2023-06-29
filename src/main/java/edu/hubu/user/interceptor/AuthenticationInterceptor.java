@@ -7,9 +7,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.hubu.common.utils.R;
 import edu.hubu.user.entity.AdminDTO;
 import edu.hubu.user.entity.UserDTO;
+import edu.hubu.user.entity.UserEntity;
+import edu.hubu.user.service.impl.UserServiceImpl;
 import edu.hubu.user.utils.JwtUtils;
 import edu.hubu.user.utils.ResponseUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
@@ -34,8 +37,8 @@ import java.util.Map;
 @Component
 @Slf4j
 public class AuthenticationInterceptor implements HandlerInterceptor {
-    @Resource
-    private StringRedisTemplate stringRedisTemplate;
+    @Autowired
+    UserServiceImpl chk;
     @Override
     public boolean preHandle( HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull Object handler) throws JsonProcessingException {
         //String token = request.getHeader("token");
@@ -77,13 +80,22 @@ public class AuthenticationInterceptor implements HandlerInterceptor {
 //                return false;
 //            }
 //        }
-        if (token == null) {
-            log.info("got a null token lol");
-//           ResponseUtil.out(response, R.error(50008,"未登录"));
-//            for(int i =0;i<1000;i++){}
-            return true;//没有token视为登出（登出同样会删除token）
-        }
+//        if (token == null) {
+//            log.info("got a null token lol");
+////           ResponseUtil.out(response, R.error(50008,"未登录"));
+////            for(int i =0;i<1000;i++){}
+//            return true;//没有token视为登出（登出同样会删除token）
+//        }
+        UserEntity e1 = chk.getUserDetail(token);
+        if(e1!=null){
 
+            if(e1.getStatus()==1){
+                log.info("got a BANNED lol");
+                ResponseUtil.out(response, R.error(50008, "你以被举办！"));
+                return false;
+            }
+
+        }
         // 如果不是映射到方法直接通过
         if (!(handler instanceof HandlerMethod)) {
             log.info("Not a Method");
@@ -98,8 +110,10 @@ public class AuthenticationInterceptor implements HandlerInterceptor {
                 method.isAnnotationPresent(Login.class) ||
                 declaringClass.isAnnotationPresent(Teacher.class) ||
                 method.isAnnotationPresent(Teacher.class)) {
+
             if (token == null) {
-                ResponseUtil.out(response, R.error(5008, "未登录"));
+                log.info("got a null token lol");
+                ResponseUtil.out(response, R.error(50008, "未登录"));
                 return true;
             }
             if (!JwtUtils.checkToken(token)) {
