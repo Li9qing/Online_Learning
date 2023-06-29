@@ -181,6 +181,7 @@ public class UserServiceImpl extends ServiceImpl<UserDao, UserEntity> implements
 
     @Override
     public UserEntity getUserDetail(String token) {
+
         String userJson = stringRedisTemplate.opsForValue().get(token);
         UserDTO index = JSON.parseObject(userJson, UserDTO.class);
         if(index == null)return null;
@@ -355,9 +356,9 @@ public class UserServiceImpl extends ServiceImpl<UserDao, UserEntity> implements
         List<CourseLessonEntity> e3 = CEL.list(LESSON);
 
 
-        Map<Long, CourseLessonEntity> LessonMap = new HashMap<>();
+        Map<String, CourseLessonEntity> LessonMap = new HashMap<>();
         for (CourseLessonEntity lesson : e3) {
-            LessonMap.put(lesson.getCourseId(), lesson);
+            LessonMap.put(lesson.getCourseId()+"_"+ lesson.getId(), lesson);
         }
 ///////////////////////////////////////////////////////////////////
 /////////////////////////////处理多对一的映射关系，并整理出前端所需的数据格式////////////////////////////////////
@@ -365,8 +366,9 @@ public class UserServiceImpl extends ServiceImpl<UserDao, UserEntity> implements
         for(int i =0;i<RAW.size();i++){
             CourseNoteEntity index = (RAW.get(i));
             Long courseId = index.getCourseId();
+            Long lessonId = index.getLessonId();
             System.out.println(courseId);
-            RESULT.add(i, UserNoteEntity.make(index,courseMap.get(courseId),LessonMap.get(courseId)));
+            RESULT.add(i, UserNoteEntity.make(index,courseMap.get(courseId),LessonMap.get(courseId+"_"+lessonId)));
         }
         page.setTotal(page.getRecords().size());
         page.setPages(page.getTotal()/page.getSize()+1);

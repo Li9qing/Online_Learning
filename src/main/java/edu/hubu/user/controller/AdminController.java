@@ -88,9 +88,11 @@ public class AdminController {
     public R findStudent(String username,String gender) {
         if(username == null && gender == null){return  EMPTYdata();}
         Map<String,Object> m1 = new HashMap<>();
+
         System.out.println(username + "__" + gender);
         if(username.length()>0)m1.put("username",username);
-        m1.put("gender",PraseGenderOnly(gender));
+        if(gender.length()>0)m1.put("gender",PraseGenderOnly(gender));
+
         m1.put("teacher_access",0);
         PageUtils page = userService.queryPage(m1);
         return R.ok().put("page", page);
@@ -101,7 +103,7 @@ public class AdminController {
         Map<String,Object> m1 = new HashMap<>();
         System.out.println(username + "__" + gender);
         if(username.length()>0)m1.put("username",username);
-        m1.put("gender",PraseGenderOnly(gender));
+        if(gender.length()>0)m1.put("gender",PraseGenderOnly(gender));
         m1.put("teacher_access",1);
         PageUtils page = userService.queryPage(m1);
         return R.ok().put("page", page);

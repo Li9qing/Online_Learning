@@ -80,12 +80,12 @@ public class AuthenticationInterceptor implements HandlerInterceptor {
 //                return false;
 //            }
 //        }
-//        if (token == null) {
-//            log.info("got a null token lol");
-////           ResponseUtil.out(response, R.error(50008,"未登录"));
-////            for(int i =0;i<1000;i++){}
-//            return true;//没有token视为登出（登出同样会删除token）
-//        }
+        if (token == null) {
+            log.info("got a null token lol");
+//           ResponseUtil.out(response, R.error(50008,"未登录"));
+//            for(int i =0;i<1000;i++){}
+            return true;//没有token视为登出（登出同样会删除token）
+        }
         UserEntity e1 = chk.getUserDetail(token);
         if(e1!=null){
 
